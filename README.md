@@ -1,4 +1,4 @@
-#  Evidenca letenja projket
+#  Evidenca letenja projekt
 
 ## Struktura projekta
 
