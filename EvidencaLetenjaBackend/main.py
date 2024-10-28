@@ -6,10 +6,8 @@ from pydantic import BaseModel
 import sqlite3
 from typing import List, Optional
 
-
 app = FastAPI()
 povezava = "../database/polet_app_baza.db"
-
 
 ### Modeli
 class Letalo(BaseModel):
@@ -30,7 +28,6 @@ class Polet(BaseModel):
     cas_pristanka: int
     Pilot_idPilot: int
 
-
 ### API poleti
 @app.post("/dodajPolet/", response_model=Polet)
 def create_polet(polet: Polet):
@@ -50,6 +47,7 @@ def create_polet(polet: Polet):
     conn.commit()
     polet_id = cursor.lastrowid
     conn.close()
+    
     return {**polet.dict(), "idPolet": polet_id}
 
 @app.get("/pridobiPolet/", response_model=List[Polet])
@@ -88,6 +86,7 @@ def delete_polet(idPolet: int):
         raise HTTPException(status_code=404, detail="Polet not found")
     conn.commit()
     conn.close()
+    
     return {"message": f"Polet with id {idPolet} deleted successfully"}
 
 @app.put("/poleti/{idPolet}", response_model=dict)
@@ -120,7 +119,6 @@ def update_polet(idPolet: int, polet: Polet):
 
     return {"message": f"Polet with id {idPolet} updated successfully"}
 
-
 ### API Letalo
 @app.delete("/letalo/{idLetalo}", response_model=dict)
 def delete_letalo(idLetalo: int):
@@ -132,6 +130,7 @@ def delete_letalo(idLetalo: int):
         raise HTTPException(status_code=404, detail="Letalo not found")
     conn.commit()
     conn.close()
+    
     return {"message": f"Letalo with id {idLetalo} deleted successfully"}
 
 ### API Pilot
@@ -145,8 +144,107 @@ def delete_pilot(idPilot: int):
         raise HTTPException(status_code=404, detail="Pilot not found")
     conn.commit()
     conn.close()
+    
     return {"message": f"Pilot with id {idPilot} deleted successfully"}
 
+@app.post("/dodajLetalo/", response_model=Letalo)
+def create_letalo(letalo: Letalo):
+    conn = sqlite3.connect("test.db")
+    cursor = conn.cursor()
+
+    # Check if registrska_st already exists
+    cursor.execute("SELECT * FROM Letalo WHERE registrska_st = ?", (letalo.registrska_st,))
+    existing_letalo = cursor.fetchone()
+    if existing_letalo:
+        conn.close()
+        return {**letalo.dict(), "idLetalo": existing_letalo[0]}
+
+    cursor.execute('''
+    INSERT INTO Letalo (ime_letala, tip, registrska_st, Polet_idPolet)
+    VALUES (?, ?, ?, ?)
+    ''', (letalo.ime_letala, letalo.tip, letalo.registrska_st, letalo.Polet_idPolet))
+    conn.commit()
+    letalo_id = cursor.lastrowid
+    conn.close()
+    
+    return {**letalo.dict(), "idLetalo": letalo_id}
+
+@app.get("/pridobiLetala/", response_model=List[Letalo])
+def read_letalos():
+    conn = sqlite3.connect("test.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Letalo")
+    letalos = cursor.fetchall()
+    conn.close()
+    
+    return [{"idLetalo": row[0], "ime_letala": row[1], "tip": row[2], "registrska_st": row[3], "Polet_idPolet": row[4]} for row in letalos]
+
+# CRUD for Pilot
+@app.post("/dodajPilota/", response_model=Pilot)
+def create_pilot(pilot: Pilot):
+    conn = sqlite3.connect("test.db")
+    cursor = conn.cursor()
+
+    # Check if a pilot with the same name exists
+    cursor.execute("SELECT * FROM Pilot WHERE ime = ? AND priimek = ?", (pilot.ime, pilot.priimek))
+    existing_pilot = cursor.fetchone()
+    if existing_pilot:
+        conn.close()
+        return {**pilot.dict(), "idPilot": existing_pilot[0]}
+
+    cursor.execute('''
+    INSERT INTO Pilot (ime, priimek)
+    VALUES (?, ?)
+    ''', (pilot.ime, pilot.priimek))
+    conn.commit()
+    pilot_id = cursor.lastrowid
+    conn.close()
+    
+    return {**pilot.dict(), "idPilot": pilot_id}
+
+@app.get("/pridobiPilote/", response_model=List[Pilot])
+def read_pilots():
+    conn = sqlite3.connect("test.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Pilot")
+    pilots = cursor.fetchall()
+    conn.close()
+    
+    return [{"idPilot": row[0], "ime": row[1], "priimek": row[2]} for row in pilots]
+
+@app.put("/letalo/{idLetalo}", response_model=dict)
+def update_letalo(idLetalo: int, letalo: Letalo):
+    conn = sqlite3.connect("test.db")
+    cursor = conn.cursor()
+
+    # Retrieve the existing Letalo to check if it exists
+    cursor.execute("SELECT * FROM Letalo WHERE idLetalo = ?", (idLetalo,))
+    existing_letalo = cursor.fetchone()
+    if not existing_letalo:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Letalo not found")
+
+    # Prepare the update fields
+    update_fields = {
+        "ime_letala": letalo.ime_letala or existing_letalo[1],
+        "tip": letalo.tip or existing_letalo[2],
+        "registrska_st": letalo.registrska_st or existing_letalo[3],
+        "Polet_idPolet": letalo.Polet_idPolet if letalo.Polet_idPolet is not None else existing_letalo[4]
+    }
+
+    # Execute the update in the database
+    cursor.execute(
+        '''
+        UPDATE Letalo
+        SET ime_letala = ?, tip = ?, registrska_st = ?, Polet_idPolet = ?
+        WHERE idLetalo = ?
+        ''',
+        (update_fields["ime_letala"], update_fields["tip"], update_fields["registrska_st"], update_fields["Polet_idPolet"], idLetalo)
+    )
+    conn.commit()
+    conn.close()
+
+    return {"message": f"Letalo with id {idLetalo} updated successfully"}
 
 @app.get("/", status_code=status.HTTP_200_OK)
 async def root():
@@ -164,7 +262,6 @@ async def say_hello(name: str):
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"error": "Name is required"}
         )
-
 
 if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=8000)
