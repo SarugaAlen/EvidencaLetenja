@@ -3,7 +3,7 @@
 ## Struktura projekta
 
     Backend: FastAPI
-    Frontend: Flask
+    Frontend: Svelte
     Database: MySQL
 
 ##   Git Flow
