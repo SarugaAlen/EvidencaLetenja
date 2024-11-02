@@ -4,6 +4,7 @@
 
     Backend: FastAPI
     Frontend: Svelte
+    UI: shadcn-svelte
     Database: MySQL
 
 ##   Git Flow
