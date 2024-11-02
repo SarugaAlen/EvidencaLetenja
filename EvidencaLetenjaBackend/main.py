@@ -1,6 +1,7 @@
 import uvicorn as uvicorn
 from fastapi import FastAPI, status, HTTPException, Query
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 from pydantic import BaseModel
 import sqlite3
@@ -8,6 +9,14 @@ from typing import List, Optional
 
 app = FastAPI()
 povezava = "../database/polet_app_baza.db"
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Add your frontend origin here
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 ### Modeli
 class Letalo(BaseModel):
@@ -63,18 +72,26 @@ def read_poleti():
 @app.get("/pridobiPoletPredDatumom/", response_model=List[Polet])
 def read_poleti_before_date(date: str = Query(..., description="Date in format YYYY-MM-DD")):
     try:
-        timestamp = int(datetime.strptime(date, "%Y-%m-%d").timestamp())
+        formatted_date = datetime.strptime(date, "%Y-%m-%d").strftime("%d%m%Y%H%M")  # Adjust as needed
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid date format. Please use YYYY-MM-DD.")
 
     conn = sqlite3.connect(povezava)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Polet WHERE cas_vzleta < ?", (timestamp,))
+    
+    cursor.execute("SELECT * FROM Polet WHERE cas_vzleta < ?", (formatted_date,))
     poleti = cursor.fetchall()
     conn.close()
 
-    return [{"idPolet": row[0], "cas_vzleta": row[1], "cas_pristanka": row[2], "Pilot_idPilot": row[3]} for row in
-            poleti]
+    return [
+        {
+            "idPolet": row[0],
+            "cas_vzleta": row[1],
+            "cas_pristanka": row[2],
+            "Pilot_idPilot": row[3]
+        }
+        for row in poleti
+    ]
 
 @app.delete("/polet/{idPolet}", response_model=dict)
 def delete_polet(idPolet: int):
