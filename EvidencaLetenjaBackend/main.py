@@ -188,7 +188,7 @@ def create_letalo(letalo: Letalo):
 
 @app.get("/pridobiLetala/", response_model=List[Letalo])
 def read_letalos():
-    conn = sqlite3.connect("test.db")
+    conn = sqlite3.connect(povezava)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Letalo")
     letalos = cursor.fetchall()
@@ -199,7 +199,7 @@ def read_letalos():
 # CRUD for Pilot
 @app.post("/dodajPilota/", response_model=Pilot)
 def create_pilot(pilot: Pilot):
-    conn = sqlite3.connect("test.db")
+    conn = sqlite3.connect(povezava)
     cursor = conn.cursor()
 
     # Check if a pilot with the same name exists
@@ -221,7 +221,7 @@ def create_pilot(pilot: Pilot):
 
 @app.get("/pridobiPilote/", response_model=List[Pilot])
 def read_pilots():
-    conn = sqlite3.connect("test.db")
+    conn = sqlite3.connect(povezava)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Pilot")
     pilots = cursor.fetchall()
@@ -231,7 +231,7 @@ def read_pilots():
 
 @app.put("/letalo/{idLetalo}", response_model=dict)
 def update_letalo(idLetalo: int, letalo: Letalo):
-    conn = sqlite3.connect("test.db")
+    conn = sqlite3.connect(povezava)
     cursor = conn.cursor()
 
     # Retrieve the existing Letalo to check if it exists
