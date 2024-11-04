@@ -73,18 +73,21 @@ def read_poleti():
     return [{"idPolet": row[0], "cas_vzleta": row[1], "cas_pristanka": row[2], "Pilot_idPilot": row[3]} for row in poleti]
 
 
-#Ni delujoče
-@app.get("/pridobiPoletPredDatumom/", response_model=List[Polet])
-def read_poleti_before_date(date: str = Query(..., description="Date in format YYYY-MM-DD")):
-    try:
-        formatted_date = datetime.strptime(date, "%Y-%m-%d").strftime("%d%m%Y%H%M")
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid date format. Please use YYYY-MM-DD.")
+@app.get("/pridobiZgodovinoLetov/", response_model=List[Polet])
+def read_poleti_before_date():
+    current_date = datetime.now().date()
 
     conn = sqlite3.connect(povezava)
     cursor = conn.cursor()
-    
-    cursor.execute("SELECT * FROM Polet WHERE cas_vzleta < ?", (formatted_date,))
+
+    cursor.execute(
+        """
+        SELECT * FROM Polet 
+        WHERE date(substr(cas_vzleta, 7, 4) || '-' || substr(cas_vzleta, 4, 2) || '-' || substr(cas_vzleta, 1, 2)) < ?
+        """,
+        (current_date,)
+    )
+
     poleti = cursor.fetchall()
     conn.close()
 
