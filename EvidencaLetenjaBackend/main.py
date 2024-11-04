@@ -12,7 +12,7 @@ povezava = "../database/polet_app_baza.db"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Add your frontend origin here
+    allow_origins=["*"],  # Add your frontend origin here
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
@@ -33,11 +33,14 @@ class Pilot(BaseModel):
 
 class Polet(BaseModel):
     idPolet: Optional[int] = None
-    cas_vzleta: int
-    cas_pristanka: int
+    cas_vzleta: str  # Stored as text
+    cas_pristanka: str  # Stored as text
     Pilot_idPilot: int
 
+
 ### API poleti
+
+# Delujoče
 @app.post("/dodajPolet/", response_model=Polet)
 def create_polet(polet: Polet):
     conn = sqlite3.connect(povezava)
@@ -59,6 +62,7 @@ def create_polet(polet: Polet):
     
     return {**polet.dict(), "idPolet": polet_id}
 
+#Delujoče
 @app.get("/pridobiPolet/", response_model=List[Polet])
 def read_poleti():
     conn = sqlite3.connect(povezava)
@@ -68,11 +72,12 @@ def read_poleti():
     conn.close()
     return [{"idPolet": row[0], "cas_vzleta": row[1], "cas_pristanka": row[2], "Pilot_idPilot": row[3]} for row in poleti]
 
-### Potrebno testiranje
+
+#Ni delujoče
 @app.get("/pridobiPoletPredDatumom/", response_model=List[Polet])
 def read_poleti_before_date(date: str = Query(..., description="Date in format YYYY-MM-DD")):
     try:
-        formatted_date = datetime.strptime(date, "%Y-%m-%d").strftime("%d%m%Y%H%M")  # Adjust as needed
+        formatted_date = datetime.strptime(date, "%Y-%m-%d").strftime("%d%m%Y%H%M")
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid date format. Please use YYYY-MM-DD.")
 
@@ -93,6 +98,7 @@ def read_poleti_before_date(date: str = Query(..., description="Date in format Y
         for row in poleti
     ]
 
+#Delujoče
 @app.delete("/polet/{idPolet}", response_model=dict)
 def delete_polet(idPolet: int):
     conn = sqlite3.connect(povezava)
@@ -106,6 +112,8 @@ def delete_polet(idPolet: int):
     
     return {"message": f"Polet with id {idPolet} deleted successfully"}
 
+
+# Ni delujoče
 @app.put("/poleti/{idPolet}", response_model=dict)
 def update_polet(idPolet: int, polet: Polet):
     conn = sqlite3.connect(povezava)
@@ -136,7 +144,9 @@ def update_polet(idPolet: int, polet: Polet):
 
     return {"message": f"Polet with id {idPolet} updated successfully"}
 
+
 ### API Letalo
+#Delujoče
 @app.delete("/letalo/{idLetalo}", response_model=dict)
 def delete_letalo(idLetalo: int):
     conn = sqlite3.connect(povezava)
@@ -151,6 +161,8 @@ def delete_letalo(idLetalo: int):
     return {"message": f"Letalo with id {idLetalo} deleted successfully"}
 
 ### API Pilot
+
+#Delujoče
 @app.delete("/pilot/{idPilot}", response_model=dict)
 def delete_pilot(idPilot: int):
     conn = sqlite3.connect(povezava)
@@ -164,12 +176,12 @@ def delete_pilot(idPilot: int):
     
     return {"message": f"Pilot with id {idPilot} deleted successfully"}
 
-@app.post("/dodajLetalo/", response_model=Letalo)
+## Delujoče
+@app.post("/dodajLetalo/")
 def create_letalo(letalo: Letalo):
-    conn = sqlite3.connect("test.db")
+    conn = sqlite3.connect(povezava)
     cursor = conn.cursor()
 
-    # Check if registrska_st already exists
     cursor.execute("SELECT * FROM Letalo WHERE registrska_st = ?", (letalo.registrska_st,))
     existing_letalo = cursor.fetchone()
     if existing_letalo:
@@ -186,6 +198,7 @@ def create_letalo(letalo: Letalo):
     
     return {**letalo.dict(), "idLetalo": letalo_id}
 
+#Delujoče
 @app.get("/pridobiLetala/", response_model=List[Letalo])
 def read_letalos():
     conn = sqlite3.connect(povezava)
@@ -196,7 +209,8 @@ def read_letalos():
     
     return [{"idLetalo": row[0], "ime_letala": row[1], "tip": row[2], "registrska_st": row[3], "Polet_idPolet": row[4]} for row in letalos]
 
-# CRUD for Pilot
+
+#Delujoče
 @app.post("/dodajPilota/", response_model=Pilot)
 def create_pilot(pilot: Pilot):
     conn = sqlite3.connect(povezava)
@@ -219,6 +233,7 @@ def create_pilot(pilot: Pilot):
     
     return {**pilot.dict(), "idPilot": pilot_id}
 
+#Delujoče
 @app.get("/pridobiPilote/", response_model=List[Pilot])
 def read_pilots():
     conn = sqlite3.connect(povezava)
@@ -229,19 +244,18 @@ def read_pilots():
     
     return [{"idPilot": row[0], "ime": row[1], "priimek": row[2]} for row in pilots]
 
+#Delujoče
 @app.put("/letalo/{idLetalo}", response_model=dict)
 def update_letalo(idLetalo: int, letalo: Letalo):
     conn = sqlite3.connect(povezava)
     cursor = conn.cursor()
 
-    # Retrieve the existing Letalo to check if it exists
     cursor.execute("SELECT * FROM Letalo WHERE idLetalo = ?", (idLetalo,))
     existing_letalo = cursor.fetchone()
     if not existing_letalo:
         conn.close()
         raise HTTPException(status_code=404, detail="Letalo not found")
 
-    # Prepare the update fields
     update_fields = {
         "ime_letala": letalo.ime_letala or existing_letalo[1],
         "tip": letalo.tip or existing_letalo[2],
@@ -249,7 +263,6 @@ def update_letalo(idLetalo: int, letalo: Letalo):
         "Polet_idPolet": letalo.Polet_idPolet if letalo.Polet_idPolet is not None else existing_letalo[4]
     }
 
-    # Execute the update in the database
     cursor.execute(
         '''
         UPDATE Letalo
@@ -267,18 +280,6 @@ def update_letalo(idLetalo: int, letalo: Letalo):
 async def root():
     return {"message": "Hello World"}
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    if name:
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={"message": f"Hello {name}"}
-        )
-    else:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"error": "Name is required"}
-        )
 
 if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=8000)
