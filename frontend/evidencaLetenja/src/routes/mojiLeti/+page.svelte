@@ -1,7 +1,9 @@
 <script lang="ts">
     import * as Table from "$lib/components/ui/table/index.js";
     import { Button } from "$lib/components/ui/button";
+    import AddFlightDialog from "./addFlightDialog.svelte";
     import { onMount } from "svelte";
+
 
     interface Polet {
         idPolet: number;
@@ -13,9 +15,7 @@
     let poleti: Polet[] = [];
 
     async function fetchFlightsBeforeDate(date: string) {
-        const response = await fetch(
-            `http://localhost:8000/pridobiPolet/`,
-        );
+        const response = await fetch(`http://localhost:8000/pridobiPolet/`);
         if (!response.ok) {
             console.error("Failed to fetch flights:", response.statusText);
             return;
@@ -29,13 +29,20 @@
     }
 
     async function deleteFlight(id: number) {
-        const response = await fetch(`http://localhost:8000/polet/${id}`, { method: "DELETE" });
+        const response = await fetch(`http://localhost:8000/polet/${id}`, {
+            method: "DELETE",
+        });
         if (response.ok) {
-            poleti = poleti.filter(polet => polet.idPolet !== id);
+            poleti = poleti.filter((polet) => polet.idPolet !== id);
             console.log("Flight deleted:", id);
         } else {
             console.error("Failed to delete flight:", response.statusText);
         }
+    }
+
+    function handleSave(data: { cas_vzleta: string; cas_pristanka: string; id_pilota: number }) {
+        
+        console.log("Save flight:", data);
     }
 
     onMount(() => {
@@ -53,8 +60,10 @@
         </h1>
     </section>
     <section>
+        <AddFlightDialog onSave={handleSave} />
+    </section>
+    <section>
         <Table.Root>
-            <Table.Caption>Pregled prihajajočih letov</Table.Caption>
             <Table.Header>
                 <Table.Row class="table-row">
                     <Table.Head class="w-[100px]">ID</Table.Head>
@@ -95,5 +104,3 @@
     </section>
 </main>
 
-<style>
-</style>
