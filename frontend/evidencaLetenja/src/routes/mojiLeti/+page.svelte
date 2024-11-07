@@ -1,20 +1,21 @@
 <script lang="ts">
-    import * as Table from "$lib/components/ui/table/index.js";
-    import { Button } from "$lib/components/ui/button";
-    import AddFlightDialog from "./addFlightDialog.svelte";
-    import { onMount } from "svelte";
-    import { DateFormatter, type DateValue, getLocalTimeZone } from "@internationalized/date";
+import * as Table from "$lib/components/ui/table/index.js";
+import { Button } from "$lib/components/ui/button";
+import AddFlightDialog from "./addFlightDialog.svelte";
+import { onMount } from "svelte";
+import { DateFormatter, type DateValue, getLocalTimeZone } from "@internationalized/date";
 
-    interface Polet {
-        idPolet: number;
-        cas_vzleta: string;
-        cas_pristanka: string;
-        Pilot_idPilot: number;
-    }
 
-    let poleti: Polet[] = [];
+  interface Polet {
+    idPolet: number;
+    cas_vzleta: string;
+    cas_pristanka: string;
+    Pilot_idPilot: number;
+  }
 
-    async function fetchFlightsBeforeDate(date: string) {
+  let poleti: Polet[] = [];
+  
+  async function fetchFlightsBeforeDate(date: string) {
         const response = await fetch(`http://localhost:8000/pridobiPolet/`);
         if (!response.ok) {
             console.error("Failed to fetch flights:", response.statusText);
@@ -22,13 +23,9 @@
         }
         const data = await response.json();
         poleti = data;
-    }
+  }  
 
-    async function editFlight(id: number) {
-        console.log("Edit flight with ID:", id);
-    }
-
-    async function deleteFlight(id: number) {
+async function deleteFlight(id: number) {
         const response = await fetch(`http://localhost:8000/polet/${id}`, {
             method: "DELETE",
         });
@@ -40,7 +37,7 @@
         }
     }
 
-    async function handleFlightSave(flightData: { cas_vzleta: string; cas_pristanka: string; id_pilota: number }) {
+  async function handleFlightSave(flightData: { cas_vzleta: string; cas_pristanka: string; id_pilota: number }) {
         console.log("Flight data received in parent component:", flightData);
         try {
             const response = await fetch('http://localhost:8000/dodajPolet/', {

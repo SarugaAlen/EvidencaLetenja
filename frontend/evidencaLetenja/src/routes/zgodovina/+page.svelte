@@ -1,47 +1,50 @@
 <script lang="ts">
-    import * as Table from "$lib/components/ui/table/index.js";
-    import { Button } from "$lib/components/ui/button";
-    import { onMount } from "svelte";
+  import * as Table from "$lib/components/ui/table/index.js";
+  import { Button } from "$lib/components/ui/button";
+  import { onMount } from "svelte";
 
-    interface Polet {
-        idPolet: number;
-        cas_vzleta: string;
-        cas_pristanka: string;
-        Pilot_idPilot: number;
+  interface Polet {
+    idPolet: number;
+    cas_vzleta: string;
+    cas_pristanka: string;
+    Pilot_idPilot: number;
+  }
+
+  let poleti: Polet[] = [];
+
+  async function fetchFlightsBeforeDate() {
+    const response = await fetch(
+      `http://localhost:8000/pridobiZgodovinoLetov/`
+    );
+
+    if (!response.ok) {
+      console.error("Failed to fetch flights:", response.statusText);
+      return;
     }
 
-    let poleti: Polet[] = [];
+    const data = await response.json();
+    poleti = data;
+  }
 
-    async function fetchFlightsBeforeDate(date: string) {
-        const response = await fetch(
-            `http://localhost:8000/pridobiPoletPredDatumom/?date=${date}`,
-        );
-        if (!response.ok) {
-            console.error("Failed to fetch flights:", response.statusText);
-            return;
-        }
-        const data = await response.json();
-        poleti = data;
-    }
+  async function editFlight(id: number) {
+    console.log("Edit flight with ID:", id);
+  }
 
-    async function editFlight(id: number) {
-        console.log("Edit flight with ID:", id);
-    }
-
-    async function deleteFlight(id: number) {
-        const response = await fetch(`http://localhost:8000/polet/${id}`, { method: "DELETE" });
-        if (response.ok) {
-            poleti = poleti.filter(polet => polet.idPolet !== id);
-            console.log("Flight deleted:", id);
-        } else {
-            console.error("Failed to delete flight:", response.statusText);
-        }
-    }
-
-    onMount(() => {
-        const today = new Date().toISOString().split("T")[0];
-        fetchFlightsBeforeDate(today);
+  async function deleteFlight(id: number) {
+    const response = await fetch(`http://localhost:8000/polet/${id}`, {
+      method: "DELETE",
     });
+    if (response.ok) {
+      poleti = poleti.filter((polet) => polet.idPolet !== id);
+      console.log("Flight deleted:", id);
+    } else {
+      console.error("Failed to delete flight:", response.statusText);
+    }
+  }
+
+  onMount(() => {
+    fetchFlightsBeforeDate();
+  });
 </script>
 
 <main class="max-w-7xl mx-auto px-4 py-8">
