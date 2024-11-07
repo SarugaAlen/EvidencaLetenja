@@ -5,8 +5,6 @@
     import { Label } from "$lib/components/ui/label/index.js";
     import Datepicker from "@/components/ui/datepicker/datepicker.svelte";
     import {
-        DateFormatter,
-        parseAbsoluteToLocal,
         type DateValue,
         getLocalTimeZone
     } from "@internationalized/date";
@@ -17,21 +15,19 @@
     let cas_pristanka: DateValue | undefined = undefined;
     let id_pilota = 0;
 
-    const dateFormatter = new DateFormatter("sl-SI", {
-        dateStyle: "short",
-        timeStyle: "short"
-    });
 
-    function handleSave() {
-        const formattedVzleta = cas_vzleta ? dateFormatter.format(cas_vzleta.toDate(getLocalTimeZone())) : "";
-        const formattedPristanka = cas_pristanka ? dateFormatter.format(cas_pristanka.toDate(getLocalTimeZone())) : "";
+    async function handleSave() {
+    const formattedVzleta = cas_vzleta ? cas_vzleta.toDate(getLocalTimeZone()).toISOString() : "";
+    const formattedPristanka = cas_pristanka ? cas_pristanka.toDate(getLocalTimeZone()).toISOString() : "";
 
-        onSave({
-            cas_vzleta: formattedVzleta,
-            cas_pristanka: formattedPristanka,
-            id_pilota
-        });
-    }
+    const flightData = {
+        cas_vzleta: formattedVzleta,
+        cas_pristanka: formattedPristanka,
+        id_pilota
+    };
+
+    onSave(flightData); 
+}
 </script>
 
 <Dialog.Root>

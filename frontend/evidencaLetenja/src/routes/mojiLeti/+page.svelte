@@ -3,7 +3,7 @@
     import { Button } from "$lib/components/ui/button";
     import AddFlightDialog from "./addFlightDialog.svelte";
     import { onMount } from "svelte";
-
+    import { DateFormatter, type DateValue, getLocalTimeZone } from "@internationalized/date";
 
     interface Polet {
         idPolet: number;
@@ -40,10 +40,29 @@
         }
     }
 
-    function handleSave(data: { cas_vzleta: string; cas_pristanka: string; id_pilota: number }) {
-        
-        console.log("Save flight:", data);
+    async function handleFlightSave(flightData: { cas_vzleta: string; cas_pristanka: string; id_pilota: number }) {
+        console.log("Flight data received in parent component:", flightData);
+        try {
+            const response = await fetch('http://localhost:8000/dodajPolet/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(flightData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save flight data');
+            }
+
+            const result = await response.json();
+            console.log("Flight saved successfully:", result);
+
+        } catch (error) {
+            console.error("Error saving flight:", error);
+        }
     }
+
 
     onMount(() => {
         const today = new Date().toISOString().split("T")[0];
@@ -60,7 +79,7 @@
         </h1>
     </section>
     <section>
-        <AddFlightDialog onSave={handleSave} />
+        <AddFlightDialog onSave={handleFlightSave} />
     </section>
     <section>
         <Table.Root>
@@ -77,14 +96,10 @@
                     <Table.Row>
                         <Table.Cell>{polet.idPolet}</Table.Cell>
                         <Table.Cell
-                            >{new Date(
-                                Number(polet.cas_vzleta) * 1000,
-                            ).toLocaleDateString("sl-SI")}</Table.Cell
+                            >{new Date(polet.cas_vzleta).toLocaleString("sl-SI", { dateStyle: "short", timeStyle: "short" })}</Table.Cell
                         >
                         <Table.Cell class="text-right"
-                            >{new Date(
-                                Number(polet.cas_pristanka) * 1000,
-                            ).toLocaleTimeString("sl-SI")}</Table.Cell
+                            >{new Date(polet.cas_pristanka).toLocaleString("sl-SI", { dateStyle: "short", timeStyle: "short" })}</Table.Cell
                         >
                         <Table.Cell class="text-right"
                             >{polet.Pilot_idPilot}</Table.Cell
@@ -103,4 +118,3 @@
         </Table.Root>
     </section>
 </main>
-

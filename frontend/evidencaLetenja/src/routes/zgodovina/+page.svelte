@@ -68,14 +68,10 @@
                     <Table.Row>
                         <Table.Cell>{polet.idPolet}</Table.Cell>
                         <Table.Cell
-                            >{new Date(
-                                Number(polet.cas_vzleta) * 1000,
-                            ).toLocaleDateString("sl-SI")}</Table.Cell
+                            >{new Date(polet.cas_vzleta).toLocaleString("sl-SI", { dateStyle: "short", timeStyle: "short" })}</Table.Cell
                         >
                         <Table.Cell class="text-right"
-                            >{new Date(
-                                Number(polet.cas_pristanka) * 1000,
-                            ).toLocaleTimeString("sl-SI")}</Table.Cell
+                            >{new Date(polet.cas_pristanka).toLocaleString("sl-SI", { dateStyle: "short", timeStyle: "short" })}</Table.Cell
                         >
                         <Table.Cell class="text-right"
                             >{polet.Pilot_idPilot}</Table.Cell
