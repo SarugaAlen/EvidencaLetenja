@@ -48,43 +48,50 @@
 </script>
 
 <main class="max-w-7xl mx-auto px-4 py-8">
-  <section>
-    <h1
-      class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-6"
-    >
-      Zgodovina
-    </h1>
-  </section>
-  <section>
-    <Table.Root>
-      <Table.Caption>Zgodovina letov</Table.Caption>
-      <Table.Header>
-        <Table.Row class="table-row">
-          <Table.Head class="w-[100px]">ID</Table.Head>
-          <Table.Head class="text-right">Čas vzleta</Table.Head>
-          <Table.Head class="text-right">Čas pristanka</Table.Head>
-          <Table.Head class="text-right">Pilot ID</Table.Head>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        <!--Potrebno, da foreach vsebuje ključ polet.idPolet-->
-        {#each poleti as polet (polet.idPolet)}
-          <Table.Row>
-            <Table.Cell>{polet.idPolet}</Table.Cell>
-            <Table.Cell class="text-right">{polet.cas_vzleta}</Table.Cell>
-            <Table.Cell class="text-right">{polet.cas_pristanka}</Table.Cell>
-            <Table.Cell class="text-right">{polet.Pilot_idPilot}</Table.Cell>
-            <Table.Cell class="text-right">
-              <Button on:click={() => editFlight(polet.idPolet)}>Edit</Button>
-              <Button on:click={() => deleteFlight(polet.idPolet)}
-                >Delete</Button
-              >
-            </Table.Cell>
-          </Table.Row>
-        {/each}
-      </Table.Body>
-    </Table.Root>
-  </section>
+    <section>
+        <h1
+            class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-6"
+        >
+            Zgodovina
+        </h1>
+    </section>
+    <section>
+        <Table.Root>
+            <Table.Caption>Zgodovina letov</Table.Caption>
+            <Table.Header>
+                <Table.Row class="table-row">
+                    <Table.Head class="w-[100px]">ID</Table.Head>
+                    <Table.Head class="text-right">Čas vzleta</Table.Head>
+                    <Table.Head class="text-right">Čas pristanka</Table.Head>
+                    <Table.Head class="text-right">Pilot ID</Table.Head>
+                </Table.Row>
+            </Table.Header>
+            <Table.Body>
+                {#each poleti as polet}
+                    <Table.Row>
+                        <Table.Cell>{polet.idPolet}</Table.Cell>
+                        <Table.Cell
+                            >{new Date(polet.cas_vzleta).toLocaleString("sl-SI", { dateStyle: "short", timeStyle: "short" })}</Table.Cell
+                        >
+                        <Table.Cell class="text-right"
+                            >{new Date(polet.cas_pristanka).toLocaleString("sl-SI", { dateStyle: "short", timeStyle: "short" })}</Table.Cell
+                        >
+                        <Table.Cell class="text-right"
+                            >{polet.Pilot_idPilot}</Table.Cell
+                        >
+                        <Table.Cell class="text-right">
+                            <Button on:click={() => editFlight(polet.idPolet)}
+                                >Edit</Button
+                            >
+                            <Button on:click={() => deleteFlight(polet.idPolet)}
+                                >Delete</Button
+                            >
+                        </Table.Cell>
+                    </Table.Row>
+                {/each}
+            </Table.Body>
+        </Table.Root>
+    </section>
 </main>
 
 <style>
