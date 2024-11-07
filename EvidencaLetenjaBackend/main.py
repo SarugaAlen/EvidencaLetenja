@@ -35,7 +35,7 @@ class Polet(BaseModel):
     idPolet: Optional[int] = None
     cas_vzleta: str  # Stored as text
     cas_pristanka: str  # Stored as text
-    Pilot_idPilot: int
+    Pilot_idPilot: Optional[int]
 
 
 ### API poleti
@@ -63,7 +63,7 @@ def create_polet(polet: Polet):
     return {**polet.dict(), "idPolet": polet_id}
 
 #Delujoče
-@app.get("/pridobiPolet/", response_model=List[Polet])
+@app.get("/pridobiPolete/", response_model=List[Polet])
 def read_poleti():
     conn = sqlite3.connect(povezava)
     cursor = conn.cursor()
@@ -72,19 +72,51 @@ def read_poleti():
     conn.close()
     return [{"idPolet": row[0], "cas_vzleta": row[1], "cas_pristanka": row[2], "Pilot_idPilot": row[3]} for row in poleti]
 
+@app.get("/pridobiPrihodnjeLete/", response_model=List[Polet])
+def read_poleti_after_date():
+    # Get the current date (resetting time to 00:00)
+    current_date = datetime.now().date()
 
-#Ni delujoče
-@app.get("/pridobiPoletPredDatumom/", response_model=List[Polet])
-def read_poleti_before_date(date: str = Query(..., description="Date in format YYYY-MM-DD")):
-    try:
-        formatted_date = datetime.strptime(date, "%Y-%m-%d").strftime("%d%m%Y%H%M")
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid date format. Please use YYYY-MM-DD.")
+    # Connect to the database and query for flights after the current date
+    conn = sqlite3.connect(povezava)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT * FROM Polet 
+        WHERE date(substr(cas_vzleta, 7, 4) || '-' || substr(cas_vzleta, 4, 2) || '-' || substr(cas_vzleta, 1, 2)) >= ?
+        """,
+        (current_date,)
+    )
+
+    poleti = cursor.fetchall()
+    conn.close()
+
+    return [
+        {
+            "idPolet": row[0],
+            "cas_vzleta": row[1],
+            "cas_pristanka": row[2],
+            "Pilot_idPilot": row[3]
+        }
+        for row in poleti
+    ]
+
+@app.get("/pridobiZgodovinoLetov/", response_model=List[Polet])
+def read_poleti_before_date():
+    current_date = datetime.now().date()
 
     conn = sqlite3.connect(povezava)
     cursor = conn.cursor()
-    
-    cursor.execute("SELECT * FROM Polet WHERE cas_vzleta < ?", (formatted_date,))
+
+    cursor.execute(
+        """
+        SELECT * FROM Polet 
+        WHERE date(substr(cas_vzleta, 7, 4) || '-' || substr(cas_vzleta, 4, 2) || '-' || substr(cas_vzleta, 1, 2)) < ?
+        """,
+        (current_date,)
+    )
+
     poleti = cursor.fetchall()
     conn.close()
 
@@ -113,37 +145,48 @@ def delete_polet(idPolet: int):
     return {"message": f"Polet with id {idPolet} deleted successfully"}
 
 
-# Ni delujoče
+# Še potrebno spremeniti
 @app.put("/poleti/{idPolet}", response_model=dict)
 def update_polet(idPolet: int, polet: Polet):
     conn = sqlite3.connect(povezava)
     cursor = conn.cursor()
 
+    # Fetch the existing flight details
     cursor.execute("SELECT * FROM Polet WHERE idPolet = ?", (idPolet,))
     existing_polet = cursor.fetchone()
+
     if not existing_polet:
         conn.close()
         raise HTTPException(status_code=404, detail="Polet not found")
 
-    update_fields = {
-        "cas_vzleta": polet.cas_vzleta if polet.cas_vzleta is not None else existing_polet[1],
-        "cas_pristanka": polet.cas_pristanka if polet.cas_pristanka is not None else existing_polet[2],
-        "Pilot_idPilot": polet.Pilot_idPilot if polet.Pilot_idPilot is not None else existing_polet[3]
-    }
+    # Initialize a list to hold the update parameters
+    update_fields = []
+    update_values = []
 
-    cursor.execute(
+    # Check and append the new values for `cas_vzleta` and `cas_pristanka`
+    if polet.cas_vzleta is not None:
+        update_fields.append("cas_vzleta = ?")
+        update_values.append(polet.cas_vzleta)
+
+    if polet.cas_pristanka is not None:
+        update_fields.append("cas_pristanka = ?")
+        update_values.append(polet.cas_pristanka)
+
+    # Only proceed if there are fields to update
+    if update_fields:
+        # Create the SQL statement dynamically
+        sql_update_query = f'''
+            UPDATE Polet
+            SET {', '.join(update_fields)}
+            WHERE idPolet = ?
         '''
-        UPDATE Polet
-        SET cas_vzleta = ?, cas_pristanka = ?, Pilot_idPilot = ?
-        WHERE idPolet = ?
-        ''',
-        (update_fields["cas_vzleta"], update_fields["cas_pristanka"], update_fields["Pilot_idPilot"], idPolet)
-    )
-    conn.commit()
+        update_values.append(idPolet)
+        cursor.execute(sql_update_query, update_values)
+        conn.commit()
+
     conn.close()
 
     return {"message": f"Polet with id {idPolet} updated successfully"}
-
 
 ### API Letalo
 #Delujoče
