@@ -1,31 +1,30 @@
 <script lang="ts">
-import * as Table from "$lib/components/ui/table/index.js";
-import { Button } from "$lib/components/ui/button";
-import AddFlightDialog from "./addFlightDialog.svelte";
-import { onMount } from "svelte";
-import { DateFormatter, type DateValue, getLocalTimeZone } from "@internationalized/date";
+    import * as Table from "$lib/components/ui/table/index.js";
+    import { Button } from "$lib/components/ui/button";
+    import AddFlightDialog from "$lib/components/ui/addFlight/addFlightDialog.svelte";
+    import EditFlightDialog from "$lib/components/ui/editFlight/editFlightDialog.svelte";
+    import { onMount } from "svelte";
 
+    interface Polet {
+        idPolet: number;
+        cas_vzleta: string;
+        cas_pristanka: string;
+        Pilot_idPilot: number;
+    }
 
-  interface Polet {
-    idPolet: number;
-    cas_vzleta: string;
-    cas_pristanka: string;
-    Pilot_idPilot: number;
-  }
+    let poleti: Polet[] = [];
 
-  let poleti: Polet[] = [];
-  
-  async function fetchFlightsBeforeDate(date: string) {
-        const response = await fetch(`http://localhost:8000/pridobiPolet/`);
+    async function fetchFlights() {
+        const response = await fetch(`http://localhost:8000/pridobiPolete/`);
         if (!response.ok) {
             console.error("Failed to fetch flights:", response.statusText);
             return;
         }
         const data = await response.json();
         poleti = data;
-  }  
+    }
 
-async function deleteFlight(id: number) {
+    async function deleteFlight(id: number) {
         const response = await fetch(`http://localhost:8000/polet/${id}`, {
             method: "DELETE",
         });
@@ -37,33 +36,85 @@ async function deleteFlight(id: number) {
         }
     }
 
-  async function handleFlightSave(flightData: { cas_vzleta: string; cas_pristanka: string; id_pilota: number }) {
-        console.log("Flight data received in parent component:", flightData);
+    async function handleFlightSave(flightData: {
+        cas_vzleta: string;
+        cas_pristanka: string;
+        Pilot_idPilot: number;
+    }) {
+        const formatDateTime = (dateTime: string): string => {
+            const date = new Date(dateTime);
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, "0");
+            const minutes = String(date.getMinutes()).padStart(2, "0");
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
+        };
+
+        const formattedFlightData = {
+            ...flightData,
+            cas_vzleta: formatDateTime(flightData.cas_vzleta),
+            cas_pristanka: formatDateTime(flightData.cas_pristanka),
+            pilot_idPilot: flightData.Pilot_idPilot,
+        };
+
         try {
-            const response = await fetch('http://localhost:8000/dodajPolet/', {
-                method: 'POST',
+            const response = await fetch("http://localhost:8000/dodajPolet/", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(flightData),
+                body: JSON.stringify(formattedFlightData),
             });
 
             if (!response.ok) {
-                throw new Error('Failed to save flight data');
+                throw new Error("Failed to save flight data");
             }
 
             const result = await response.json();
             console.log("Flight saved successfully:", result);
-
+            refreshPage();
         } catch (error) {
             console.error("Error saving flight:", error);
         }
     }
 
+    async function handleEditSave(updatedFlightData: Polet) {
+        try {
+            console.log("updatedFlightData", updatedFlightData.Pilot_idPilot);
+            const response = await fetch(
+                `http://localhost:8000/poleti/${updatedFlightData.idPolet}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(updatedFlightData),
+                },
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to update flight data");
+            }
+
+            console.log("Flight updated successfully:", updatedFlightData);
+            refreshPage();
+        } catch (error) {
+            console.error("Error updating flight:", error);
+        }
+    }
+
+    function parseCustomDate(dateString: string) {
+        const [day, month, year, time] = dateString.split(/[/\s:]/);
+        return new Date(`${year}-${month}-${day}T${time}:00`);
+    }
+
+    function refreshPage() {
+        fetchFlights();
+    }
 
     onMount(() => {
-        const today = new Date().toISOString().split("T")[0];
-        fetchFlightsBeforeDate(today);
+        fetchFlights();
     });
 </script>
 
@@ -92,22 +143,38 @@ async function deleteFlight(id: number) {
                 {#each poleti as polet}
                     <Table.Row>
                         <Table.Cell>{polet.idPolet}</Table.Cell>
-                        <Table.Cell
-                            >{new Date(polet.cas_vzleta).toLocaleString("sl-SI", { dateStyle: "short", timeStyle: "short" })}</Table.Cell
-                        >
-                        <Table.Cell class="text-right"
-                            >{new Date(polet.cas_pristanka).toLocaleString("sl-SI", { dateStyle: "short", timeStyle: "short" })}</Table.Cell
-                        >
+                        <Table.Cell class="text-right">
+                            {polet.cas_vzleta
+                                ? parseCustomDate(
+                                      polet.cas_vzleta,
+                                  ).toLocaleString("sl-SI", {
+                                      dateStyle: "short",
+                                      timeStyle: "short",
+                                  })
+                                : "Invalid Date"}
+                        </Table.Cell>
+                        <Table.Cell class="text-right">
+                            {polet.cas_pristanka
+                                ? parseCustomDate(
+                                      polet.cas_pristanka,
+                                  ).toLocaleString("sl-SI", {
+                                      dateStyle: "short",
+                                      timeStyle: "short",
+                                  })
+                                : "Invalid Date"}
+                        </Table.Cell>
                         <Table.Cell class="text-right"
                             >{polet.Pilot_idPilot}</Table.Cell
                         >
                         <Table.Cell class="text-right">
-                            <Button on:click={() => editFlight(polet.idPolet)}
-                                >Edit</Button
+                            <EditFlightDialog {polet} onSave={handleEditSave}
+                            ></EditFlightDialog>
+                            <Button
+                                class="bg-red-500 text-white"
+                                on:click={() => deleteFlight(polet.idPolet)}
                             >
-                            <Button on:click={() => deleteFlight(polet.idPolet)}
-                                >Delete</Button
-                            >
+                                Delete
+                            </Button>
                         </Table.Cell>
                     </Table.Row>
                 {/each}
