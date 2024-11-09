@@ -4,6 +4,7 @@
     import { onMount } from "svelte";
     import * as Table from "$lib/components/ui/table/index.js";
     import { Cell } from "@/components/ui/calendar";
+    import AddPlaneDialog from "$lib/components/ui/addPlane/addPlaneDialog.svelte";
     
     type Plane = {
       idLetalo: number;
@@ -28,6 +29,34 @@
       }
     }
 
+    async function handlePlaneSave(planeData: {
+      ime_letala: string;
+      tip: string;
+      registrska_st: string;
+      Polet_idPolet: number;
+    }) {
+        try {
+            const response = await fetch("http://localhost:8000/dodajLetalo/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(planeData),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to save plane data");
+            }
+
+            const result = await response.json();
+            console.log("Plane saved successfully:", result);
+            refreshPage();
+        } catch (error) {
+            console.error("Error saving plane:", error);
+        }
+    }
+
+  
 
     async function deletePlane(id: number) {
         const response = await fetch(`http://localhost:8000/letalo/${id}`, {
@@ -46,6 +75,9 @@
       getPlanes();
     });
 
+    function refreshPage() {
+      getPlanes();
+    }
 
   </script>
   
@@ -54,6 +86,10 @@
       <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-8 text-center text-gray-800">
         Letala
       </h1>
+    </section>
+
+    <section>
+      <AddPlaneDialog onSave={handlePlaneSave} />
     </section>
   
     <section>
