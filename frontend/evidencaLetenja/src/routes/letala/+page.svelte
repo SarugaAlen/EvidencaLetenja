@@ -1,6 +1,9 @@
 <script lang="ts">
     import * as Carousel from "$lib/components/ui/carousel/index.js";
+    import Button from "@/components/ui/button/button.svelte";
     import { onMount } from "svelte";
+    import * as Table from "$lib/components/ui/table/index.js";
+    import { Cell } from "@/components/ui/calendar";
     
     type Plane = {
       idLetalo: number;
@@ -25,14 +28,28 @@
       }
     }
 
+
+    async function deletePlane(id: number) {
+        const response = await fetch(`http://localhost:8000/letalo/${id}`, {
+            method: "DELETE",
+        });
+        if (response.ok) {
+            planes = planes.filter((plane) => plane.idLetalo !== id);
+            console.log("Izbrisano letalo:", id);
+        } else {
+            console.error("Letalo ni bilo uspešno izbrisano:", response.statusText);
+        }
+    }
+
     onMount(() => {
         console.log(planes)
       getPlanes();
     });
 
+
   </script>
   
-  <main class="max-w-7xl mx-auto px-4 py-8">
+  <main class=" flex flex-col gap-6 max-w-7xl mx-auto px-4 py-8">
     <section>
       <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-8 text-center text-gray-800">
         Letala
@@ -50,6 +67,7 @@
                 <p class="text-gray-600"><strong>Registracijska številka:</strong> {plane.registrska_st}</p>
                 <p class="text-gray-600"><strong>Letalo ID:</strong> {plane.idLetalo}</p>
                 <p class="text-gray-600"><strong>Polet ID:</strong> {plane.Polet_idPolet}</p>
+                <Button on:click={() => deletePlane(plane.idLetalo)}>Izbrisi letalo</Button>
               </div>
             </Carousel.Item>
           {/each}
@@ -58,6 +76,31 @@
         <Carousel.Next class="carousel-control" />
       </Carousel.Root>
     </section>
+
+    <section>
+      <Table.Root>
+          <Table.Header>
+              <Table.Row class="table-row">
+                  <Table.Head>ID</Table.Head>
+                  <Table.Head>Ime letala</Table.Head>
+                  <Table.Head>Registrska številka</Table.Head>
+                  <Table.Head>Tip letala</Table.Head>
+                  <Table.Head>Izbriši</Table.Head>
+              </Table.Row>
+          </Table.Header>
+          <Table.Body>
+              {#each planes as plane}
+                  <Table.Row>
+                      <Table.Cell>{plane.idLetalo}</Table.Cell>
+                      <Table.Cell>{plane.ime_letala}</Table.Cell>
+                      <Table.Cell>{plane.registrska_st}</Table.Cell>
+                      <Table.Cell>{plane.tip}</Table.Cell>
+                      <Table.Cell><Button on:click={() => deletePlane(plane.idLetalo)}>Izbrisi letalo</Button></Table.Cell>
+                  </Table.Row>
+              {/each}
+          </Table.Body>
+      </Table.Root>
+  </section>
   </main>
   
   <style>
