@@ -1,17 +1,10 @@
 import uvicorn as uvicorn
-from fastapi import FastAPI, status, HTTPException, Query
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
-from datetime import datetime
-from pydantic import BaseModel
-import sqlite3
-from typing import List, Optional
-from models.schemas import Letalo, Polet, Pilot
 from core.database import initialize_database
 from routes import letalo, pilot, polet
 
 app = FastAPI()
-povezava = "../database/polet_app_baza.db"
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,7 +23,6 @@ app.include_router(pilot.router)
 @app.get("/", status_code=status.HTTP_200_OK)
 async def root():
     return {"message": "Hello World"}
-
 
 if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=8000)
