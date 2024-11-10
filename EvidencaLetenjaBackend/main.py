@@ -24,20 +24,7 @@ app.add_middleware(
 initialize_database()
 
 app.include_router(polet.router)
-### API Letalo
-#Delujoče
-@app.delete("/letalo/{idLetalo}", response_model=dict)
-def delete_letalo(idLetalo: int):
-    conn = sqlite3.connect(povezava)
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM Letalo WHERE idLetalo = ?", (idLetalo,))
-    if cursor.rowcount == 0:
-        conn.close()
-        raise HTTPException(status_code=404, detail="Letalo not found")
-    conn.commit()
-    conn.close()
-    
-    return {"message": f"Letalo with id {idLetalo} deleted successfully"}
+app.include_router(letalo.router)
 
 ### API Pilot
 
@@ -54,40 +41,6 @@ def delete_pilot(idPilot: int):
     conn.close()
     
     return {"message": f"Pilot with id {idPilot} deleted successfully"}
-
-## Delujoče
-@app.post("/dodajLetalo/")
-def create_letalo(letalo: Letalo):
-    conn = sqlite3.connect(povezava)
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM Letalo WHERE registrska_st = ?", (letalo.registrska_st,))
-    existing_letalo = cursor.fetchone()
-    if existing_letalo:
-        conn.close()
-        return {**letalo.dict(), "idLetalo": existing_letalo[0]}
-
-    cursor.execute('''
-    INSERT INTO Letalo (ime_letala, tip, registrska_st, Polet_idPolet)
-    VALUES (?, ?, ?, ?)
-    ''', (letalo.ime_letala, letalo.tip, letalo.registrska_st, letalo.Polet_idPolet))
-    conn.commit()
-    letalo_id = cursor.lastrowid
-    conn.close()
-    
-    return {**letalo.dict(), "idLetalo": letalo_id}
-
-#Delujoče
-@app.get("/pridobiLetala/", response_model=List[Letalo])
-def read_letalos():
-    conn = sqlite3.connect(povezava)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Letalo")
-    letalos = cursor.fetchall()
-    conn.close()
-    
-    return [{"idLetalo": row[0], "ime_letala": row[1], "tip": row[2], "registrska_st": row[3], "Polet_idPolet": row[4]} for row in letalos]
-
 
 #Delujoče
 @app.post("/dodajPilota/", response_model=Pilot)
@@ -122,38 +75,6 @@ def read_pilots():
     conn.close()
     
     return [{"idPilot": row[0], "ime": row[1], "priimek": row[2]} for row in pilots]
-
-#Delujoče
-@app.put("/letalo/{idLetalo}", response_model=dict)
-def update_letalo(idLetalo: int, letalo: Letalo):
-    conn = sqlite3.connect(povezava)
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM Letalo WHERE idLetalo = ?", (idLetalo,))
-    existing_letalo = cursor.fetchone()
-    if not existing_letalo:
-        conn.close()
-        raise HTTPException(status_code=404, detail="Letalo not found")
-
-    update_fields = {
-        "ime_letala": letalo.ime_letala or existing_letalo[1],
-        "tip": letalo.tip or existing_letalo[2],
-        "registrska_st": letalo.registrska_st or existing_letalo[3],
-        "Polet_idPolet": letalo.Polet_idPolet if letalo.Polet_idPolet is not None else existing_letalo[4]
-    }
-
-    cursor.execute(
-        '''
-        UPDATE Letalo
-        SET ime_letala = ?, tip = ?, registrska_st = ?, Polet_idPolet = ?
-        WHERE idLetalo = ?
-        ''',
-        (update_fields["ime_letala"], update_fields["tip"], update_fields["registrska_st"], update_fields["Polet_idPolet"], idLetalo)
-    )
-    conn.commit()
-    conn.close()
-
-    return {"message": f"Letalo with id {idLetalo} updated successfully"}
 
 @app.get("/", status_code=status.HTTP_200_OK)
 async def root():
