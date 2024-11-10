@@ -7,6 +7,8 @@ from pydantic import BaseModel
 import sqlite3
 from typing import List, Optional
 from models.schemas import Letalo, Polet, Pilot
+from core.database import initialize_database
+from routes import letalo, pilot, polet
 
 app = FastAPI()
 povezava = "../database/polet_app_baza.db"
@@ -19,156 +21,9 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-### API poleti
+initialize_database()
 
-# Delujoče
-@app.post("/dodajPolet/", response_model=Polet)
-def create_polet(polet: Polet):
-    conn = sqlite3.connect(povezava)
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM Polet WHERE Pilot_idPilot = ?", (polet.Pilot_idPilot,))
-    existing_polet = cursor.fetchone()
-    if existing_polet:
-        conn.close()
-        return {**polet.dict(), "idPolet": existing_polet[0]}
-
-    cursor.execute('''
-    INSERT INTO Polet (cas_vzleta, cas_pristanka, Pilot_idPilot)
-    VALUES (?, ?, ?)
-    ''', (polet.cas_vzleta, polet.cas_pristanka, polet.Pilot_idPilot))
-    conn.commit()
-    polet_id = cursor.lastrowid
-    conn.close()
-    
-    return {**polet.dict(), "idPolet": polet_id}
-
-#Delujoče
-@app.get("/pridobiPolete/", response_model=List[Polet])
-def read_poleti():
-    conn = sqlite3.connect(povezava)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Polet")
-    poleti = cursor.fetchall()
-    conn.close()
-    return [{"idPolet": row[0], "cas_vzleta": row[1], "cas_pristanka": row[2], "Pilot_idPilot": row[3]} for row in poleti]
-
-@app.get("/pridobiPrihodnjeLete/", response_model=List[Polet])
-def read_poleti_after_date():
-    # Get the current date (resetting time to 00:00)
-    current_date = datetime.now().date()
-
-    # Connect to the database and query for flights after the current date
-    conn = sqlite3.connect(povezava)
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        SELECT * FROM Polet 
-        WHERE date(substr(cas_vzleta, 7, 4) || '-' || substr(cas_vzleta, 4, 2) || '-' || substr(cas_vzleta, 1, 2)) >= ?
-        """,
-        (current_date,)
-    )
-
-    poleti = cursor.fetchall()
-    conn.close()
-
-    return [
-        {
-            "idPolet": row[0],
-            "cas_vzleta": row[1],
-            "cas_pristanka": row[2],
-            "Pilot_idPilot": row[3]
-        }
-        for row in poleti
-    ]
-
-@app.get("/pridobiZgodovinoLetov/", response_model=List[Polet])
-def read_poleti_before_date():
-    current_date = datetime.now().date()
-
-    conn = sqlite3.connect(povezava)
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        SELECT * FROM Polet 
-        WHERE date(substr(cas_vzleta, 7, 4) || '-' || substr(cas_vzleta, 4, 2) || '-' || substr(cas_vzleta, 1, 2)) < ?
-        """,
-        (current_date,)
-    )
-
-    poleti = cursor.fetchall()
-    conn.close()
-
-    return [
-        {
-            "idPolet": row[0],
-            "cas_vzleta": row[1],
-            "cas_pristanka": row[2],
-            "Pilot_idPilot": row[3]
-        }
-        for row in poleti
-    ]
-
-#Delujoče
-@app.delete("/polet/{idPolet}", response_model=dict)
-def delete_polet(idPolet: int):
-    conn = sqlite3.connect(povezava)
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM Polet WHERE idPolet = ?", (idPolet,))
-    if cursor.rowcount == 0:
-        conn.close()
-        raise HTTPException(status_code=404, detail="Polet not found")
-    conn.commit()
-    conn.close()
-    
-    return {"message": f"Polet with id {idPolet} deleted successfully"}
-
-
-# Še potrebno spremeniti
-@app.put("/poleti/{idPolet}", response_model=dict)
-def update_polet(idPolet: int, polet: Polet):
-    conn = sqlite3.connect(povezava)
-    cursor = conn.cursor()
-
-    # Fetch the existing flight details
-    cursor.execute("SELECT * FROM Polet WHERE idPolet = ?", (idPolet,))
-    existing_polet = cursor.fetchone()
-
-    if not existing_polet:
-        conn.close()
-        raise HTTPException(status_code=404, detail="Polet not found")
-
-    # Initialize a list to hold the update parameters
-    update_fields = []
-    update_values = []
-
-    # Check and append the new values for `cas_vzleta` and `cas_pristanka`
-    if polet.cas_vzleta is not None:
-        update_fields.append("cas_vzleta = ?")
-        update_values.append(polet.cas_vzleta)
-
-    if polet.cas_pristanka is not None:
-        update_fields.append("cas_pristanka = ?")
-        update_values.append(polet.cas_pristanka)
-
-    # Only proceed if there are fields to update
-    if update_fields:
-        # Create the SQL statement dynamically
-        sql_update_query = f'''
-            UPDATE Polet
-            SET {', '.join(update_fields)}
-            WHERE idPolet = ?
-        '''
-        update_values.append(idPolet)
-        cursor.execute(sql_update_query, update_values)
-        conn.commit()
-
-    conn.close()
-
-    return {"message": f"Polet with id {idPolet} updated successfully"}
-
+app.include_router(polet.router)
 ### API Letalo
 #Delujoče
 @app.delete("/letalo/{idLetalo}", response_model=dict)
