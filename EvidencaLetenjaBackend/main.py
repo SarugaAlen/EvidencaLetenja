@@ -6,6 +6,7 @@ from datetime import datetime
 from pydantic import BaseModel
 import sqlite3
 from typing import List, Optional
+from models.schemas import Letalo, Polet, Pilot
 
 app = FastAPI()
 povezava = "../database/polet_app_baza.db"
@@ -17,26 +18,6 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
 )
-
-### Modeli
-class Letalo(BaseModel):
-    idLetalo: Optional[int] = None
-    ime_letala: Optional[str] = None
-    tip: Optional[str] = None
-    registrska_st: Optional[str] = None
-    Polet_idPolet: Optional[int] = None
-
-class Pilot(BaseModel):
-    idPilot: Optional[int] = None
-    ime: str
-    priimek: str
-
-class Polet(BaseModel):
-    idPolet: Optional[int] = None
-    cas_vzleta: str  # Stored as text
-    cas_pristanka: str  # Stored as text
-    Pilot_idPilot: Optional[int]
-
 
 ### API poleti
 
