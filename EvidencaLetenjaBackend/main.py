@@ -25,56 +25,7 @@ initialize_database()
 
 app.include_router(polet.router)
 app.include_router(letalo.router)
-
-### API Pilot
-
-#Delujoče
-@app.delete("/pilot/{idPilot}", response_model=dict)
-def delete_pilot(idPilot: int):
-    conn = sqlite3.connect(povezava)
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM Pilot WHERE idPilot = ?", (idPilot,))
-    if cursor.rowcount == 0:
-        conn.close()
-        raise HTTPException(status_code=404, detail="Pilot not found")
-    conn.commit()
-    conn.close()
-    
-    return {"message": f"Pilot with id {idPilot} deleted successfully"}
-
-#Delujoče
-@app.post("/dodajPilota/", response_model=Pilot)
-def create_pilot(pilot: Pilot):
-    conn = sqlite3.connect(povezava)
-    cursor = conn.cursor()
-
-    # Check if a pilot with the same name exists
-    cursor.execute("SELECT * FROM Pilot WHERE ime = ? AND priimek = ?", (pilot.ime, pilot.priimek))
-    existing_pilot = cursor.fetchone()
-    if existing_pilot:
-        conn.close()
-        return {**pilot.dict(), "idPilot": existing_pilot[0]}
-
-    cursor.execute('''
-    INSERT INTO Pilot (ime, priimek)
-    VALUES (?, ?)
-    ''', (pilot.ime, pilot.priimek))
-    conn.commit()
-    pilot_id = cursor.lastrowid
-    conn.close()
-    
-    return {**pilot.dict(), "idPilot": pilot_id}
-
-#Delujoče
-@app.get("/pridobiPilote/", response_model=List[Pilot])
-def read_pilots():
-    conn = sqlite3.connect(povezava)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Pilot")
-    pilots = cursor.fetchall()
-    conn.close()
-    
-    return [{"idPilot": row[0], "ime": row[1], "priimek": row[2]} for row in pilots]
+app.include_router(pilot.router)
 
 @app.get("/", status_code=status.HTTP_200_OK)
 async def root():
