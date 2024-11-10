@@ -28,6 +28,7 @@
 
 ## Funkcionalnosti
 
+
 ### Leti
 
 Na strani **Leti** ima uporabnik dostop do vseh prihajajočih letov:

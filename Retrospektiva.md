@@ -40,7 +40,6 @@
     
     Prav tako bi se lahko dogovorili za zmanjšanje odvisnosti od ChatGPT-ja in drugih orodij, da bi se člani ekipe bolj zanašali na lastno znanje in izkušnje, kar bo pripomoglo k večjemu razumevanju kode. Dokumentiranje ključnih funkcionalnosti in tehničnih rešitev bi omogočilo, da vsi člani lažje sledijo napredku in razumejo ključne odločitve, tudi če niso neposredno vključeni v določene naloge.
     
-
 ---
 
 ## Dodatne opombe
