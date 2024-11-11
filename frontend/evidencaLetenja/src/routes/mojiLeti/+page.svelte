@@ -15,7 +15,7 @@
     let poleti: Polet[] = [];
 
     async function fetchFlights() {
-        const response = await fetch(`http://localhost:8000/pridobiPolete/`);
+        const response = await fetch(`http://localhost:8000/pridobiPrihodnjeLete/`);
         if (!response.ok) {
             console.error("Failed to fetch flights:", response.statusText);
             return;
