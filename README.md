@@ -18,3 +18,5 @@ Develop Branch (develop): Glavna veja za integracijo novih funkcionalnosti in sk
 Release Branch (release/vX.X): Uporablja se za pripravo končne verzije pred izidom (release). Na tej veji se izvajajo zadnji popravki, popravki verzij, optimizacije in končna testiranja. Ko je vse pripravljeno, se združi v main.
 
 Main Branch (main): Primarna veja za produkcijo, ki vsebuje vedno zadnjo stabilno verzijo projekta. Vsaka sprememba v tej veji je preverjena, preizkušena in pripravljena za uporabnike.
+
+## GitHub Actions
