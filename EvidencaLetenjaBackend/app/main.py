@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.database import initialize_database
 from routes import letalo, pilot, polet
 
+from fastapi.testclient import TestClient
+
 app = FastAPI()
 
 app.add_middleware(

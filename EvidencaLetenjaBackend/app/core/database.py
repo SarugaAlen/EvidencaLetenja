@@ -1,6 +1,6 @@
 import sqlite3
 
-DATABASE_URL = "../database/polet_app_baza.db"
+DATABASE_URL = "/home/benjamin/Desktop/RIRSProjekt/RIRS_EvidencaLetenjaProjekt/database/polet_app_baza.db"
 
 def get_connection():
     conn = sqlite3.connect(DATABASE_URL)
