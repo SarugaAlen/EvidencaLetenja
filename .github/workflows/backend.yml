@@ -33,7 +33,6 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r EvidencaLetenjaBackend/requirements.txt
-          pip install coverage pytest
 
   test-backend:
     runs-on: ubuntu-latest
