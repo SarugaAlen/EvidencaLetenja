@@ -79,7 +79,7 @@
                 <Label for="cas_vzleta" class="text-right">Čas vzleta</Label>
                 <Datepicker bind:value={cas_vzleta} />
             </div>
-            <div class="grid grid-cols-4 items-center gap-4">
+            <div id="cas_pristanka_id" class="grid grid-cols-4 items-center gap-4">
                 <Label for="cas_pristanka" class="text-right"
                     >Čas pristanka</Label
                 >
@@ -100,3 +100,6 @@
         </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>
+
+
+
