@@ -3,7 +3,6 @@
     import Button from "@/components/ui/button/button.svelte";
     import { onMount } from "svelte";
     import * as Table from "$lib/components/ui/table/index.js";
-    import { Cell } from "@/components/ui/calendar";
     import AddPlaneDialog from "$lib/components/ui/addPlane/addPlaneDialog.svelte";
     
     type Plane = {
