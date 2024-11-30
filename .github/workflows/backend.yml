@@ -34,13 +34,26 @@ jobs:
           pip install --upgrade pip
           pip install -r EvidencaLetenjaBackend/requirements.txt
 
-      - name: Install test dependencies
+  test-backend:
+    runs-on: ubuntu-latest
+    needs: build-backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Set PYTHONPATH
         run: |
-          pip install pytest pytest-cov
+          export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE/EvidencaLetenjaBackend
 
       - name: Run tests
         run: |
-            pytest --rootdir=EvidencaLetenjaBackend EvidencaLetenjaBackend/app/tests --cov=EvidencaLetenjaBackend --cov-report=xml
+          pytest --rootdir=EvidencaLetenjaBackend EvidencaLetenjaBackend/app/tests --cov=EvidencaLetenjaBackend --cov-report=xml
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
