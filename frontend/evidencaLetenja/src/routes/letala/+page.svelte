@@ -102,7 +102,7 @@
                 <p class="text-gray-600"><strong>Registracijska številka:</strong> {plane.registrska_st}</p>
                 <p class="text-gray-600"><strong>Letalo ID:</strong> {plane.idLetalo}</p>
                 <p class="text-gray-600"><strong>Polet ID:</strong> {plane.Polet_idPolet}</p>
-                <Button on:click={() => deletePlane(plane.idLetalo)}>Izbrisi letalo</Button>
+                <Button class="bg-red-500 text-white" on:click={() => deletePlane(plane.idLetalo)}>Izbrisi letalo</Button>
               </div>
             </Carousel.Item>
           {/each}
@@ -130,7 +130,7 @@
                       <Table.Cell>{plane.ime_letala}</Table.Cell>
                       <Table.Cell>{plane.registrska_st}</Table.Cell>
                       <Table.Cell>{plane.tip}</Table.Cell>
-                      <Table.Cell><Button on:click={() => deletePlane(plane.idLetalo)}>Izbrisi letalo</Button></Table.Cell>
+                      <Table.Cell><Button class="bg-red-500 text-white" on:click={() => deletePlane(plane.idLetalo)}>Izbrisi letalo</Button></Table.Cell>
                   </Table.Row>
               {/each}
           </Table.Body>
