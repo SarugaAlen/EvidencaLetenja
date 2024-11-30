@@ -40,7 +40,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest EvidencaLetenjaBackend/app/tests --cov=EvidencaLetenjaBackend --cov-report=xml
+            pytest --rootdir=EvidencaLetenjaBackend EvidencaLetenjaBackend/app/tests --cov=EvidencaLetenjaBackend --cov-report=xml
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
