@@ -1,5 +1,4 @@
 name: Backend CI
-
 on:
   push:
     branches:
@@ -7,20 +6,16 @@ on:
   pull_request:
     branches:
       - develop
-
 jobs:
   build-backend:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
       - name: Set up Python environment
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-
       - name: Cache Python dependencies
         uses: actions/cache@v3
         with:
@@ -28,34 +23,27 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('EvidencaLetenjaBackend/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r EvidencaLetenjaBackend/requirements.txt
-
   test-backend:
     runs-on: ubuntu-latest
     needs: build-backend
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
       - name: Set up Python environment
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-
       - name: Install test dependencies
         run: |
           pip install pytest pytest-cov coverage httpx pytest-html
           pip install -r EvidencaLetenjaBackend/requirements.txt
-
       - name: Set up Python path
         run: |
           echo "PYTHONPATH=$GITHUB_WORKSPACE/EvidencaLetenjaBackend/app:$PYTHONPATH" >> $GITHUB_ENV
-
       - name: Run tests with coverage
         working-directory: EvidencaLetenjaBackend
         run: |
@@ -65,17 +53,17 @@ jobs:
             --cov-report=html:coverage-html \
             --html=test-results.html \
             --self-contained-html
-
+            
       - name: Upload coverage XML report
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-xml
+          name: backend-coverage
           path: EvidencaLetenjaBackend/coverage.xml
           
-      - name: Upload coverage HTML report
+      - name: Upload HTML coverage report
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-html
+          name: coverage-html-report
           path: EvidencaLetenjaBackend/coverage-html/
           
       - name: Upload test results
@@ -83,14 +71,3 @@ jobs:
         with:
           name: test-results
           path: EvidencaLetenjaBackend/test-results.html
-
-      - name: Generate coverage badge
-        uses: tj-actions/coverage-badge-py@v2
-        with:
-          output: coverage.svg
-          
-      - name: Upload coverage badge
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-badge
-          path: coverage.svg
