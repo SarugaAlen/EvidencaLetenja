@@ -47,6 +47,11 @@ jobs:
         with:
           python-version: '3.9'
 
+      - name: Install test dependencies
+        run: |
+          pip install pytest pytest-cov coverage
+          pip install -r EvidencaLetenjaBackend/requirements.txt
+
       - name: Set PYTHONPATH
         run: |
           export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE/EvidencaLetenjaBackend
