@@ -45,10 +45,6 @@ describe('Edit Flight Dialog', () => {
     const pilotInput = screen.getByLabelText('Pilot ID') as HTMLInputElement;
     expect(pilotInput.value).toBe('123');
 
-    //const secondItem = screen.findAllByTestId('#cas_pristanka_id > div:nth-child(2)');
-    //expect(secondItem).toBeInTheDocument();
-
-
   });
 
   it('preveri, ce onSave shrani pravilne podatke', async () => {
