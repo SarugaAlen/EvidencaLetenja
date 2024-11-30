@@ -1,11 +1,12 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
 from core.database import get_connection
+from tests.testna_baza_setup import test_db
 from models.schemas import Letalo
 from typing import List
 
 router = APIRouter()
 
-@router.post("/dodajLetalo/", response_model=Letalo)
+@router.post("/dodajLetalo/", response_model=Letalo, status_code=status.HTTP_201_CREATED)
 def create_letalo(letalo: Letalo):
     with get_connection() as conn:
         cursor = conn.cursor()
@@ -33,14 +34,44 @@ def delete_letalo(idLetalo: int):
         conn.commit()
     return {"message": "Letalo deleted successfully"}
 
-@router.put("/letalo/{idLetalo}", response_model=dict)
+# @router.put("/letalo/{idLetalo}", response_model=dict)
+# def update_letalo(idLetalo: int, letalo: Letalo):
+#     with get_connection() as conn:
+#         cursor = conn.cursor()
+
+#         cursor.execute("SELECT * FROM Letalo WHERE idLetalo = ?", (idLetalo,))
+#         existing_letalo = cursor.fetchone()
+        
+#         if not existing_letalo:
+#             raise HTTPException(status_code=404, detail="Letalo not found")
+
+#         update_fields = {
+#             "ime_letala": letalo.ime_letala or existing_letalo[1],
+#             "tip": letalo.tip or existing_letalo[2],
+#             "registrska_st": letalo.registrska_st or existing_letalo[3],
+#             "Polet_idPolet": letalo.Polet_idPolet if letalo.Polet_idPolet is not None else existing_letalo[4]
+#         }
+
+#         cursor.execute(
+#             """
+#             UPDATE Letalo
+#             SET ime_letala = ?, tip = ?, registrska_st = ?, Polet_idPolet = ?
+#             WHERE idLetalo = ?
+#             """,
+#             (update_fields["ime_letala"], update_fields["tip"], update_fields["registrska_st"], update_fields["Polet_idPolet"], idLetalo)
+#         )
+#         conn.commit()
+
+#     return {"message": f"Letalo with id {idLetalo} updated successfully"}
+
+@router.put("/letalo/{idLetalo}", response_model=Letalo)
 def update_letalo(idLetalo: int, letalo: Letalo):
     with get_connection() as conn:
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM Letalo WHERE idLetalo = ?", (idLetalo,))
         existing_letalo = cursor.fetchone()
-        
+
         if not existing_letalo:
             raise HTTPException(status_code=404, detail="Letalo not found")
 
@@ -52,13 +83,18 @@ def update_letalo(idLetalo: int, letalo: Letalo):
         }
 
         cursor.execute(
-            '''
+            """
             UPDATE Letalo
             SET ime_letala = ?, tip = ?, registrska_st = ?, Polet_idPolet = ?
             WHERE idLetalo = ?
-            ''',
+            """,
             (update_fields["ime_letala"], update_fields["tip"], update_fields["registrska_st"], update_fields["Polet_idPolet"], idLetalo)
         )
         conn.commit()
 
-    return {"message": f"Letalo with id {idLetalo} updated successfully"}
+        # Retrieve the updated Letalo from the database
+        cursor.execute("SELECT * FROM Letalo WHERE idLetalo = ?", (idLetalo,))
+        updated_letalo = cursor.fetchone()
+
+    # Return the updated Letalo object
+    return Letalo(**dict(updated_letalo))

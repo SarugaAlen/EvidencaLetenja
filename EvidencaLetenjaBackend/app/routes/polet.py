@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
 from core.database import get_connection
 from models.schemas import Polet
 from typing import List
@@ -6,7 +6,7 @@ from datetime import datetime
 
 router = APIRouter()
 
-@router.post("/dodajPolet/", response_model=Polet)
+@router.post("/dodajPolet/", response_model=Polet, status_code=status.HTTP_201_CREATED)
 def create_polet(polet: Polet):
     with get_connection() as conn:
         cursor = conn.cursor()
