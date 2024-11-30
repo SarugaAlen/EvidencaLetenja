@@ -32,3 +32,15 @@ def delete_pilot(idPilot: int):
         cursor.execute("DELETE FROM Pilot WHERE idPilot = ?", (idPilot,))
         conn.commit()
     return {"message": "Pilot deleted successfully"}
+
+@router.get("/pilot/{idPilot}", response_model=Pilot)
+def get_pilot_by_id(idPilot: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Pilot WHERE idPilot = ?", (idPilot,))
+        row = cursor.fetchone()
+        
+        if row is None:
+            raise HTTPException(status_code=404, detail="Pilot not found")
+
+        return Pilot(**dict(row))

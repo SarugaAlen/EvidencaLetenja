@@ -7,9 +7,6 @@ test('AddFlightDialog button can be clicked', async () => {
     render(AddFlightDialog);
 
     const button = screen.getByRole('button', { name: /Dodaj/i });
-
-    //await fireEvent.click(button);
-
     expect(button).toBeInTheDocument();
   });
 

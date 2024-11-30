@@ -1,6 +1,6 @@
 import sqlite3
 
-DATABASE_URL = "/home/benjamin/Desktop/RIRSProjekt/RIRS_EvidencaLetenjaProjekt/database/polet_app_baza.db"
+DATABASE_URL = "/home/benjamin/Desktop/RIRSProjekt/RIRS_EvidencaLetenjaProjekt/database/test.db"
 
 def get_connection():
     conn = sqlite3.connect(DATABASE_URL)
@@ -31,4 +31,6 @@ def initialize_database():
             cas_pristanka TEXT,
             Pilot_idPilot INTEGER
         )''')
+
         conn.commit()
+

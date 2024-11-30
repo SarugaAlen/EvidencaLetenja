@@ -62,3 +62,16 @@ def update_letalo(idLetalo: int, letalo: Letalo):
         conn.commit()
 
     return {"message": f"Letalo with id {idLetalo} updated successfully"}
+
+
+@router.get("/letalo/{idLetalo}", response_model=Letalo)
+def get_letalo_by_id(idLetalo: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Letalo WHERE idLetalo = ?", (idLetalo,))
+        row = cursor.fetchone()
+
+        if row is None:
+            raise HTTPException(status_code=404, detail="Letalo not found")
+
+        return Letalo(**dict(row))

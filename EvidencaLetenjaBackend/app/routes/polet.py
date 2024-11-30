@@ -18,6 +18,18 @@ def create_polet(polet: Polet):
         polet.idPolet = cursor.lastrowid
     return polet
 
+@router.get("/polet/{idPolet}", response_model=Polet)
+def read_polet(idPolet: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Polet WHERE idPolet = ?", (idPolet,))
+        row = cursor.fetchone()
+
+    if not row:
+        raise HTTPException(status_code=404, detail="Polet not found")
+
+    return Polet(**dict(row)) 
+
 @router.get("/pridobiPolete/", response_model=List[Polet])
 def read_poleti():
     with get_connection() as conn:
