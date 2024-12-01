@@ -15,12 +15,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Python environment
+      - name: Pripravi Python okolje
         uses: actions/setup-python@v4
         with:
           python-version: '3.10.12'  
 
-      - name: Cache Python dependencies
+      - name: Cache Python odvisnosti
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
@@ -28,7 +28,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install dependencies
+      - name: Namesti odvisnosti
         run: |
           pip install --upgrade pip
           pip install -r EvidencaLetenjaBackend/requirements.txt
@@ -45,7 +45,7 @@ jobs:
         with:
           python-version: '3.10.12' 
 
-      - name: Install test dependencies
+      - name: Namesti odvisnosti za testiranje
         run: |
           pip install pytest pytest-cov coverage httpx pytest-html
           pip install -r EvidencaLetenjaBackend/requirements.txt
@@ -64,20 +64,8 @@ jobs:
             --html=test-results.html \
             --self-contained-html
 
-      - name: Upload coverage XML report
+      - name: Porocilo testiranja
         uses: actions/upload-artifact@v4
         with:
-          name: backend-coverage
-          path: EvidencaLetenjaBackend/coverage.xml
-
-      - name: Upload HTML coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-html-report
-          path: EvidencaLetenjaBackend/coverage-html/
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: EvidencaLetenjaBackend/test-results.html
+          name: test_results
+          path: EvidencaLetenjaBackend/test_results.html
