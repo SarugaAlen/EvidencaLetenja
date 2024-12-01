@@ -67,5 +67,6 @@ jobs:
       - name: Porocilo testiranja
         uses: actions/upload-artifact@v4
         with:
-          name: test_results
-          path: EvidencaLetenjaBackend/test_results.html
+          name: test-results
+          path: EvidencaLetenjaBackend/test-results.html
+
