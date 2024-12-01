@@ -10,21 +10,17 @@ from main import app
 client = TestClient(app)
 
 
-# 1. Test creating a new pilot (POST /dodajPilota/)
 def test_create_pilot():
-    # Data to send in the request
+
     pilot_data = {
         "ime": "Janez",
         "priimek": "Novak"
     }
 
-    # Send a POST request to create a new pilot
     response = client.post("/dodajPilota/", json=pilot_data)
 
-    # Check if the response status code is 200 OK
     assert response.status_code == 200
 
-    # Check if the response contains the expected data
     data = response.json()
     assert "idPilot" in data
     assert data["ime"] == pilot_data["ime"]
@@ -36,6 +32,7 @@ def test_read_pilots():
         "ime": "Miha",
         "priimek": "Kovac"
     }
+
     client.post("/dodajPilota/", json=pilot_data)
 
     response = client.get("/pridobiPilote/")
@@ -55,6 +52,7 @@ def test_delete_pilot():
         "ime": "Andrej",
         "priimek": "Zajc"
     }
+
     create_response = client.post("/dodajPilota/", json=pilot_data)
     created_pilot_id = create_response.json()["idPilot"]
 
@@ -67,3 +65,18 @@ def test_delete_pilot():
     assert response.status_code == 404  # The pilot should no longer exist
 
 
+def test_get_non_existent_pilot():
+    response = client.get("/pilot/99999")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Pilot not found"}
+
+def test_create_pilot_missing_fields():
+    pilot_data = {
+        "ime": "Marko"
+        # "priimek" nima vrednosti
+    }
+
+    response = client.post("/dodajPilota/", json=pilot_data)
+
+    assert response.status_code == 422
+    assert "detail" in response.json() 
