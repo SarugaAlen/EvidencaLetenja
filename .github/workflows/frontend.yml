@@ -43,8 +43,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
-          path: frontend/evidencaLetenja/dist/
-          if-no-files-found: error # Fails the job if no files are found
+          path: frontend/evidencaLetenja/build/
+          if-no-files-found: error
 
   test-frontend:
     needs: build-frontend
