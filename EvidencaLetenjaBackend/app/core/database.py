@@ -1,9 +1,7 @@
 import os
 import sqlite3
 
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
-DATABASE_URL = os.path.join(project_root, 'database/test.db')
-#DATABASE_URL = "database/test.db"
+DATABASE_URL = "../database/test.db"
 
 def get_connection():
     conn = sqlite3.connect(DATABASE_URL)
