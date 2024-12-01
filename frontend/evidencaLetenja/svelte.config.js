@@ -15,9 +15,6 @@ const config = {
 		alias: {
 			'@/*': 'src/lib/*', // Sets '@/' as an alias for the 'src/lib' directory
 		  },
-		  build: {
-			outDir: 'frontend/evidencaLetenja/dist', // Custom build output directory
-		  },
 	}
 };
 
