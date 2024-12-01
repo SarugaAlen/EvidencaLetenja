@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
-import Page from '/home/benjamin/Desktop/RIRSProjekt/RIRS_EvidencaLetenjaProjekt/frontend/evidencaLetenja/src/routes/zgodovina/+page.svelte';
+import Page from '../routes/zgodovina/+page.svelte';
 import { describe, it, expect, vi, type Mock } from 'vitest';
 import '@testing-library/jest-dom';
 
