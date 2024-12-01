@@ -3,10 +3,10 @@ name: Backend CI
 on:
   push:
     branches:
-      - develop  # Trigger on push to develop branch
+      - develop 
   pull_request:
     branches:
-      - develop  # Trigger on pull request to develop branch
+      - develop  
 
 jobs:
   build-backend:
@@ -18,7 +18,7 @@ jobs:
       - name: Set up Python environment
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'  # Adjust to your desired Python version
+          python-version: '3.10.12'  
 
       - name: Cache Python dependencies
         uses: actions/cache@v3
@@ -35,7 +35,7 @@ jobs:
 
   test-backend:
     runs-on: ubuntu-latest
-    needs: build-backend  # Ensures tests run only after the build job completes successfully
+    needs: build-backend 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -43,7 +43,7 @@ jobs:
       - name: Set up Python environment
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'  # Adjust to your desired Python version
+          python-version: '3.10.12' 
 
       - name: Install test dependencies
         run: |
@@ -57,7 +57,7 @@ jobs:
       - name: Run tests with coverage
         working-directory: EvidencaLetenjaBackend
         run: |
-          python -m pytest app/tests/test_*.py \
+          python -m pytest app/test_*.py \
             --cov=app \
             --cov-report=xml \
             --cov-report=html:coverage-html \
