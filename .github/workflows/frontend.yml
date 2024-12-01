@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
-          path: frontend/evidencaLetenja/build/
+          path: frontend/evidencaLetenja/.svelte-kit/output
           if-no-files-found: error
 
   test-frontend:
@@ -83,3 +83,5 @@ jobs:
           name: frontend-coverage
           path: frontend/evidencaLetenja/coverage/
           if-no-files-found: error # Fails the job if no files are found
+
+
