@@ -52,8 +52,15 @@ jobs:
             --cov-report=html:coverage-html \
             --html=test-results.html \
             --self-contained-html
-      - name: Upload test results
+
+      - name: Nalaganje rezultatov testov v XML
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+            name: pokristost-backend
+            path: EvidencaLetenjaBackend/coverage.xml
+      
+      - name: Nalaganje rezultatov testov v HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-rezultati-backend
           path: EvidencaLetenjaBackend/test-results.html
