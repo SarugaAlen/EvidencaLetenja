@@ -1,7 +1,9 @@
 import sqlite3
+import os
 
-#DATABASE_URL = "../database/polet_app_baza.db"
-DATABASE_URL = 'C:/Users/alen2/OneDrive/Namizje/FERI/Magisterski/1. letnik/1. semester/RIRS/Project/database/polet_app_baza.db'
+DATABASE_URL = os.path.join(os.path.dirname(__file__), "../database/test.db")
+
+os.makedirs(os.path.dirname(DATABASE_URL), exist_ok=True)
 
 def get_connection():
     conn = sqlite3.connect(DATABASE_URL)

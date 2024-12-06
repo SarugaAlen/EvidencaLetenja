@@ -10,7 +10,10 @@
     ime: string;
     priimek: string;
   }
+
   let piloti: Pilot[] = [];
+  let searchQuery: string = "";
+  let filteredPiloti: Pilot[] = []; 
 
   async function fetchPilots() {
     const response = await fetch(`http://localhost:8000/pridobiPilote/`, {
@@ -85,6 +88,12 @@
     }
   }
 
+  $: filteredPiloti = piloti.filter(
+    (pilot) =>
+      pilot.ime.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      pilot.priimek.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   function refreshPage() {
     fetchPilots();
   }
@@ -102,12 +111,23 @@
       Piloti
     </h1>
   </section>
+
+  <section class="mb-4">
+    <input
+      type="text"
+      bind:value={searchQuery}
+      placeholder="Išči po imenu ali priimku"
+      class="w-full border border-gray-300 rounded-md p-2"
+    />
+  </section>
+
   <section>
     <AddPilotDialog
-      pilot={{idPilot: 0 , ime: "", priimek: "" }}
+      pilot={{ idPilot: 0, ime: "", priimek: "" }}
       onSave={handlePilotSave}
     />
   </section>
+
   <section>
     <Table.Root>
       <Table.Header>
@@ -115,21 +135,23 @@
           <Table.Head class="w-[100px]">ID</Table.Head>
           <Table.Head class="text-right">Ime</Table.Head>
           <Table.Head class="text-right">Priimek</Table.Head>
+          <Table.Head class="text-right">Actions</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {#each piloti as pilot}
+        {#each filteredPiloti as pilot}
           <Table.Row>
             <Table.Cell>{pilot.idPilot}</Table.Cell>
             <Table.Cell class="text-right">{pilot.ime}</Table.Cell>
             <Table.Cell class="text-right">{pilot.priimek}</Table.Cell>
             <Table.Cell class="text-right">
-              <EditPilotDialog {pilot} onSave={handleEditSave}
-              ></EditPilotDialog>
+              <EditPilotDialog {pilot} onSave={handleEditSave} />
               <Button
-                class="bg-red-500 text-white"
-                on:click={() => deletePilot(pilot.idPilot)}>Delete</Button
+                class="bg-red-500 text-white ml-2"
+                on:click={() => deletePilot(pilot.idPilot)}
               >
+                Delete
+              </Button>
             </Table.Cell>
           </Table.Row>
         {/each}

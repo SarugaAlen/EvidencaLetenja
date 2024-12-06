@@ -54,3 +54,19 @@ def delete_pilot(idPilot: int):
         cursor.execute("DELETE FROM Pilot WHERE idPilot = ?", (idPilot,))
         conn.commit()
     return {"message": "Pilot deleted successfully"}
+
+
+@router.get("/pridobiPilote/{stevilo}", response_model=List[Pilot])
+def get_pilots(stevilo: int):
+    if stevilo <= 0:
+        raise HTTPException(status_code=400, detail="The number of pilots must be greater than zero")
+    
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Pilot LIMIT ?", (stevilo,))
+        rows = cursor.fetchall()
+        
+        if not rows:
+            raise HTTPException(status_code=404, detail="No pilots found")
+        
+        return [Pilot(**dict(row)) for row in rows]
