@@ -2,7 +2,6 @@ import uvicorn as uvicorn
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from core.database import initialize_database
-from tests.testna_baza_setup import test_db
 from routes import letalo, pilot, polet
 from fastapi.testclient import TestClient
 
@@ -17,7 +16,6 @@ app.add_middleware(
 )
 
 initialize_database()
-#test_db()
 
 app.include_router(polet.router)
 app.include_router(letalo.router)
