@@ -24,6 +24,28 @@ def read_pilots():
         cursor.execute("SELECT * FROM Pilot")
         rows = cursor.fetchall()
         return [Pilot(**dict(row)) for row in rows]
+    
+@router.get("/pilot/{idPilot}", response_model=Pilot)
+def read_pilot(idPilot: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Pilot WHERE idPilot = ?", (idPilot,))
+        row = cursor.fetchone()
+        if row is None:
+            raise HTTPException(status_code=404, detail="Pilot not found")
+        return Pilot(**dict(row))
+    
+@router.put("/pilot/{idPilot}", response_model=Pilot)
+def update_pilot(idPilot: int, pilot: Pilot):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE Pilot 
+            SET ime = ?, priimek = ?
+            WHERE idPilot = ?''', 
+            (pilot.ime, pilot.priimek, idPilot))
+        conn.commit()
+    return pilot
 
 @router.delete("/pilot/{idPilot}", response_model=dict)
 def delete_pilot(idPilot: int):

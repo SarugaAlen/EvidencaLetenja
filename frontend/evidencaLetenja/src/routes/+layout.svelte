@@ -9,6 +9,7 @@
 		<a href="/mojiLeti" class="ml-4 text-white hover:text-gray-300">Moji leti</a>
 		<a href="/zgodovina" class="ml-4 text-white hover:text-gray-300">Zgodovina</a>
 		<a href="/letala" class="ml-4 text-white hover:text-gray-300">Letala</a>
+		<a href="/piloti" class="ml-4 text-white hover:text-gray-300">Piloti</a>
 	</div>
 </nav>
 
