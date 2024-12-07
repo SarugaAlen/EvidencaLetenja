@@ -1,6 +1,9 @@
+import os
+import sys
 import uvicorn as uvicorn
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from core.database import initialize_database
 from routes import letalo, pilot, polet
 

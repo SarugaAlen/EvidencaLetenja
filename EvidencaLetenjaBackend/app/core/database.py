@@ -1,7 +1,11 @@
 import os
 import sqlite3
 
-DATABASE_URL = os.path.join(os.path.dirname(__file__), "../../../database/test.db")
+#DATABASE_URL = os.path.join(os.path.dirname(__file__), "../../../database/test.db")
+
+DATABASE_URL = os.path.join(os.path.dirname(__file__), "../database/test.db")
+
+os.makedirs(os.path.dirname(DATABASE_URL), exist_ok=True)
 
 def get_connection():
     conn = sqlite3.connect(DATABASE_URL)
