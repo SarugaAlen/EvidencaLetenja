@@ -1,7 +1,7 @@
 import os
 import sqlite3
 
-DATABASE_URL = "../database/test.db"
+DATABASE_URL = os.path.join(os.path.dirname(__file__), "../../../database/test.db")
 
 def get_connection():
     conn = sqlite3.connect(DATABASE_URL)
@@ -11,7 +11,6 @@ def get_connection():
 def initialize_database():
     with get_connection() as conn:
         cursor = conn.cursor()
-        # Create the tables if they don't already exist
         cursor.execute('''CREATE TABLE IF NOT EXISTS Letalo (
             idLetalo INTEGER PRIMARY KEY,
             ime_letala TEXT,
