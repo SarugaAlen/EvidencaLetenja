@@ -15,7 +15,7 @@ ENV PYTHONPATH=/app/app
 # This will allow Python to locate the modules, including 'core'
 
 # Expose the port on which the FastAPI application will run
-EXPOSE 8080
+EXPOSE 8000
 
 # Run the FastAPI application using uvicorn, pointing to the main module inside the 'app' folder
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
