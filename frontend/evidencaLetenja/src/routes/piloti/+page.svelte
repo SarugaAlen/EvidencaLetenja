@@ -25,6 +25,7 @@
         }
       } catch (error) {
         console.error("Error fetching pilots data:", error);
+        //
       }
     }
 
