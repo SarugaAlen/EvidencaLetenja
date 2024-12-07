@@ -58,4 +58,19 @@ describe("Pilot Table Filtering", () => {
       });
     });
   });
+
+
+  it("should return an empty array when no pilots match the search query", async () => {
+    searchQuery.set("xyz");
+
+    await new Promise((resolve) => {
+      filteredPiloti.subscribe((result) => {
+        if (result.length === 0) {
+          expect(result).toEqual([]);
+          resolve(true);
+        }
+      });
+    });
+  });
+
 });
