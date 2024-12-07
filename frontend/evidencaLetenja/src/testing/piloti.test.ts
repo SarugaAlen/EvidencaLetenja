@@ -14,7 +14,6 @@ vi.mock('embla-carousel-svelte', () => ({
   },
 }));
 
-// Mock the fetch API
 global.fetch = vi.fn();
 
 describe('Pilot Management Page', () => {
@@ -64,7 +63,6 @@ describe('Pilot Management Page', () => {
     await fireEvent.input(surnameInput, { target: { value: 'Pavlić' } });
     await fireEvent.click(addButton);
 
-    // Verify fetch call was made to add a new pilot
     expect(fetch).toHaveBeenCalledWith('http://localhost:8000/dodajPilota', expect.objectContaining({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -75,17 +73,15 @@ describe('Pilot Management Page', () => {
   it('removes a pilot from the table when "Delete" is clicked', async () => {
     render(Page);
   
-    await waitFor(() => screen.getByText('Ana')); // Ensure the table data is rendered
+    await waitFor(() => screen.getByText('Ana')); 
   
-    const deleteButtons = screen.getAllByText('Izbrisi Pilota');
-    expect(deleteButtons.length).toBe(2); // There should be two pilots initially
+    let deleteButtons = screen.getAllByText('Izbrisi Pilota');
+    expect(deleteButtons.length).toBe(2); 
   
-    /* // Click the delete button for the first pilot (Janez Novak)
     await fireEvent.click(deleteButtons[0]);
-  
-    // After the delete, we expect only one pilot (Ana Kovač) to remain
-    expect(screen.getByText('Janez')).toBeNull();
-    expect(screen.getByText('Ana')).toBeInTheDocument(); */
+
+     deleteButtons = screen.getAllByText('Izbrisi Pilota');
+    expect(deleteButtons.length).toBe(1);
   });
   
 
