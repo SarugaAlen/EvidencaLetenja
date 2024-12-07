@@ -107,7 +107,7 @@
                   <Table.Head>ID</Table.Head>
                   <Table.Head>Ime</Table.Head>
                   <Table.Head>Priimek</Table.Head>
-                  <Table.Head>Izbriši</Table.Head>
+                  <Table.Head></Table.Head>
               </Table.Row>
           </Table.Header>
           <Table.Body>
