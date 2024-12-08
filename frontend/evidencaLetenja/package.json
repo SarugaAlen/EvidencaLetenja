@@ -9,7 +9,8 @@
 		"check": "svelte-kit sync && svelte-chqeck --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test": "vitest",
-		"test:coverage": "vitest --coverage"
+		"test:coverage": "vitest --coverage",
+		"start": "node build"
 	},
 	"devDependencies": {
 		"@internationalized/date": "^3.5.6",
