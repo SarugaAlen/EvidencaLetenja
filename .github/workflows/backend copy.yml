@@ -1,0 +1,96 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - develop 
+  pull_request:
+    branches:
+      - develop  
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.12'
+
+      - name: Cache virtual environment
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: ${{ runner.os }}-venv-${{ hashFiles('EvidencaLetenjaBackend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-venv-
+
+      - name: Create virtual environment
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install --upgrade pip
+          pip install -r EvidencaLetenjaBackend/requirements.txt
+
+  test-backend:
+    runs-on: ubuntu-latest
+    needs: build-backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Install test dependencies
+        run: |
+          pip install pytest pytest-cov coverage httpx pytest-html
+          pip install -r EvidencaLetenjaBackend/requirements.txt
+      - name: Set up Python path
+        run: |
+          echo "PYTHONPATH=$GITHUB_WORKSPACE/EvidencaLetenjaBackend/app:$PYTHONPATH" >> $GITHUB_ENV
+      - name: Run tests with coverage
+        working-directory: EvidencaLetenjaBackend
+        run: |
+          python -m pytest app/test_*.py \
+            --cov=app \
+            --cov-report=xml \
+            --cov-report=html:coverage-html \
+            --html=test-results.html \
+            --self-contained-html
+
+      - name: Nalaganje rezultatov testov v XML
+        uses: actions/upload-artifact@v4
+        with:
+            name: pokristost-backend
+            path: EvidencaLetenjaBackend/coverage.xml
+      
+      - name: Nalaganje rezultatov testov v HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-rezultati-backend
+          path: EvidencaLetenjaBackend/test-results.html
+
+  dockerize-and-push:
+    needs: test-backend  # Izvede se po uspešnem testiranju
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/backend:latest ./EvidencaLetenjaBackend
+          docker tag ${{ secrets.DOCKER_USERNAME }}/backend:latest ${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }}
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/backend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }}
+        
