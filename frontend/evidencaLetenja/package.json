@@ -38,6 +38,7 @@
 		"vitest": "^2.1.6"
 	},
 	"dependencies": {
+		"@sveltejs/adapter-static": "^3.0.6",
 		"@sveltejs/adapter-vercel": "^5.5.0"
 	}
 }
