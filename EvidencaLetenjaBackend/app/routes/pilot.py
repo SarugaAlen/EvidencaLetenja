@@ -44,3 +44,19 @@ def get_pilot_by_id(idPilot: int):
             raise HTTPException(status_code=404, detail="Pilot not found")
 
         return Pilot(**dict(row))
+
+@router.put("/pilot/{idPilot}", response_model=Pilot)
+def update_pilot(idPilot: int, pilot: Pilot):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE Pilot 
+            SET ime = ?, priimek = ?
+            WHERE idPilot = ?''', 
+            (pilot.ime, pilot.priimek, idPilot))
+        conn.commit()
+        
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Pilot not found")
+        
+        return {**pilot.dict(), "idPilot": idPilot}

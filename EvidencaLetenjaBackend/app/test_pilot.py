@@ -80,3 +80,13 @@ def test_create_pilot_missing_fields():
 
     assert response.status_code == 422
     assert "detail" in response.json() 
+
+def test_update_pilot_not_found():
+    non_existent_id = 1234  
+    updated_data = {"ime": "Johnny", "priimek": "DoeUpdated"}
+    
+    response = client.put(f"/pilot/{non_existent_id}", json=updated_data)
+    
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Pilot not found"}
+
