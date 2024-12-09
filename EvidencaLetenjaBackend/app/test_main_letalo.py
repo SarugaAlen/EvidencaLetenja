@@ -105,3 +105,5 @@ def test_get_non_existing_letalo():
     
     data = response.json()
     assert data["detail"] == "Letalo not found"
+
+###Test
