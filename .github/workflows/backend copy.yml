@@ -41,30 +41,36 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      
+      - name: Set up Python environment
+        run: |
+          # Activate the virtual environment created in the build-backend job
+          source .venv/bin/activate
+          
       - name: Install test dependencies
         run: |
+          # Install testing dependencies within the virtual environment
           pip install pytest pytest-cov coverage httpx pytest-html
           pip install -r EvidencaLetenjaBackend/requirements.txt
-      - name: Set up Python path
-        run: |
-          echo "PYTHONPATH=$GITHUB_WORKSPACE/EvidencaLetenjaBackend/app:$PYTHONPATH" >> $GITHUB_ENV
+      
       - name: Run tests with coverage
         working-directory: EvidencaLetenjaBackend
         run: |
+          # Run tests with coverage inside the virtual environment
           python -m pytest app/test_*.py \
             --cov=app \
             --cov-report=xml \
             --cov-report=html:coverage-html \
             --html=test-results.html \
             --self-contained-html
-
-      - name: Nalaganje rezultatov testov v XML
+      
+      - name: Upload coverage results (XML)
         uses: actions/upload-artifact@v4
         with:
-            name: pokristost-backend
-            path: EvidencaLetenjaBackend/coverage.xml
-      
-      - name: Nalaganje rezultatov testov v HTML
+          name: pokristost-backend
+          path: EvidencaLetenjaBackend/coverage.xml
+        
+      - name: Upload test results (HTML)
         uses: actions/upload-artifact@v4
         with:
           name: test-rezultati-backend
