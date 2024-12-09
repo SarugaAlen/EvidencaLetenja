@@ -36,6 +36,14 @@ jobs:
           pip install --upgrade pip
           pip install -r EvidencaLetenjaBackend/requirements.txt
 
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+            name: backend-build
+            path: EvidencaLetenjaBackend/app/
+            if-no-files-found: error
+
   test-backend:
     runs-on: ubuntu-latest
     needs: build-backend
