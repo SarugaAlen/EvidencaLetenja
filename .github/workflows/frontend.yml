@@ -85,7 +85,7 @@ jobs:
           if-no-files-found: error
 
   dockerize-and-push:
-    needs: test-frontend  # Izvede se po uspešnem testiranju
+    needs: test-frontend 
     runs-on: ubuntu-latest
 
     steps:
