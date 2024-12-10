@@ -5,7 +5,7 @@
     import * as Table from "$lib/components/ui/table/index.js";
     import { Cell } from "@/components/ui/calendar";
     
-    const apiUrl = import.meta.env.API_URL || 'http://localhost:8000';
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
     console.log('API URL:', apiUrl);
 
