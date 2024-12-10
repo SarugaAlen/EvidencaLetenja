@@ -107,3 +107,17 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:${{ github.sha}}
+
+  deploy-frontend:
+    needs: test-frontend 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        if: github.ref == 'refs/heads/develop'
+        env:
+          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_FRONTEND }}
+        run: |
+          curl "$deploy_url"
+
+
+          
