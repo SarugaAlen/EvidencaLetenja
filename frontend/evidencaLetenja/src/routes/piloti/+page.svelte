@@ -5,6 +5,12 @@
     import * as Table from "$lib/components/ui/table/index.js";
     import { Cell } from "@/components/ui/calendar";
     
+    const apiUrl = import.meta.env.API_URL || 'http://localhost:8000';
+
+    console.log('API URL:', apiUrl);
+
+
+
     type Pilot = {
       idPilot: number;
       ime: string;
@@ -17,7 +23,7 @@
   
     async function getPilots() {
       try {
-        const response = await fetch("http://localhost:8000/pridobiPilote/");
+        const response = await fetch(`${apiUrl}/pridobiPilote/`);
         if (response.ok) {
             piloti = await response.json();
         } else {
