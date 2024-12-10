@@ -7,7 +7,7 @@
         <h1
             class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl"
         >
-            Dobrodošli v Evidenco letenja
+            Dobrodošli v Evidenco letenja + s pomočjo SvelteKit in TailwindCSS
         </h1>
         <h3 class="scroll-m-20 mt-6 text-2xl font-semibold tracking-tight">
             Vaša rešitev na enem mestu za enostavno sledenje in upravljanje
