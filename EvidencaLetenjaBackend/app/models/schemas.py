@@ -18,3 +18,10 @@ class Polet(BaseModel):
     cas_vzleta: str  # Stored as text
     cas_pristanka: str  # Stored as text
     Pilot_idPilot: Optional[int]
+
+class Certifikat(BaseModel):
+    idCertifikat: Optional[int] = None
+    idPilot: int
+    ime_certifikata: str
+    datum_izdaje: str  # Format: YYYY-MM-DD
+    datum_izteka: str  # Format: YYYY-MM-DD
