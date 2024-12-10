@@ -4,6 +4,13 @@
   import { onMount } from "svelte";
   import EditFlightDialog from "$lib/components/ui/editFlight/editFlightDialog.svelte";
 
+
+
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+  console.log('API URL:', apiUrl);
+
+
   interface Polet {
     idPolet: number;
     cas_vzleta: string;
@@ -15,7 +22,7 @@
 
   async function fetchFlightsHistory() {
     const response = await fetch(
-      `http://localhost:8000/pridobiZgodovinoLetov/`,
+      `${apiUrl}/pridobiZgodovinoLetov/`,
     );
 
     if (!response.ok) {
@@ -30,7 +37,7 @@
   async function handleEditSave(updatedFlightData: Polet) {
     try {
       const response = await fetch(
-        `http://localhost:8000/poleti/${updatedFlightData.idPolet}`,
+        `${apiUrl}/poleti/${updatedFlightData.idPolet}`,
         {
           method: "PUT",
           headers: {
@@ -52,7 +59,7 @@
   }
 
   async function deleteFlight(id: number) {
-    const response = await fetch(`http://localhost:8000/polet/${id}`, {
+    const response = await fetch(`${apiUrl}/polet/${id}`, {
       method: "DELETE",
     });
     if (response.ok) {

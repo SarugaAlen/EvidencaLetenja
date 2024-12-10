@@ -5,6 +5,12 @@
     import EditFlightDialog from "$lib/components/ui/editFlight/editFlightDialog.svelte";
     import { onMount } from "svelte";
 
+
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+    console.log('API URL:', apiUrl);
+
+
     interface Polet {
         idPolet: number;
         cas_vzleta: string;
@@ -15,7 +21,7 @@
     let poleti: Polet[] = [];
 
     async function fetchFlights() {
-        const response = await fetch(`http://localhost:8000/pridobiPrihodnjeLete/`);
+        const response = await fetch(`${apiUrl}/pridobiPrihodnjeLete/`);
         if (!response.ok) {
             console.error("Failed to fetch flights:", response.statusText);
             return;
@@ -25,7 +31,7 @@
     }
 
     async function deleteFlight(id: number) {
-        const response = await fetch(`http://localhost:8000/polet/${id}`, {
+        const response = await fetch(`${apiUrl}/polet/${id}`, {
             method: "DELETE",
         });
         if (response.ok) {
@@ -59,7 +65,7 @@
         };
 
         try {
-            const response = await fetch("http://localhost:8000/dodajPolet/", {
+            const response = await fetch(`${apiUrl}/dodajPolet/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -83,7 +89,7 @@
         try {
             console.log("updatedFlightData", updatedFlightData.Pilot_idPilot);
             const response = await fetch(
-                `http://localhost:8000/poleti/${updatedFlightData.idPolet}`,
+                `${apiUrl}/poleti/${updatedFlightData.idPolet}`,
                 {
                     method: "PUT",
                     headers: {

@@ -6,6 +6,11 @@
     import { Cell } from "@/components/ui/calendar";
     import AddPlaneDialog from "$lib/components/ui/addPlane/addPlaneDialog.svelte";
     
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+    console.log('API URL:', apiUrl);
+
+
     type Plane = {
       idLetalo: number;
       ime_letala: string;
@@ -18,7 +23,7 @@
   
     async function getPlanes() {
       try {
-        const response = await fetch("http://localhost:8000/pridobiLetala/");
+        const response = await fetch(`${apiUrl}/pridobiLetala/`);
         if (response.ok) {
             planes = await response.json();
         } else {
@@ -36,7 +41,7 @@
       Polet_idPolet: number;
     }) {
         try {
-            const response = await fetch("http://localhost:8000/dodajLetalo/", {
+            const response = await fetch(`${apiUrl}/dodajLetalo/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -59,7 +64,7 @@
   
 
     async function deletePlane(id: number) {
-        const response = await fetch(`http://localhost:8000/letalo/${id}`, {
+        const response = await fetch(`${apiUrl}/letalo/${id}`, {
             method: "DELETE",
         });
         if (response.ok) {

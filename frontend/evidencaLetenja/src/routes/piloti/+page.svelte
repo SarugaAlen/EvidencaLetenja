@@ -37,7 +37,7 @@
 
     async function addPilot() {
         try {
-            const response = await fetch("http://localhost:8000/dodajPilota", {
+            const response = await fetch(`${apiUrl}/dodajPilota`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -59,7 +59,7 @@
 
 
     async function deletePilot(id: number) {
-        const response = await fetch(`http://localhost:8000/pilot/${id}`, {
+        const response = await fetch(`${apiUrl}/pilot/${id}`, {
             method: "DELETE",
         });
         if (response.ok) {
