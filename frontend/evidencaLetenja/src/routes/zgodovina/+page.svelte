@@ -11,13 +11,12 @@
     Pilot_idPilot: number;
   }
 
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
   let poleti: Polet[] = [];
 
   async function fetchFlightsHistory() {
-    const response = await fetch(
-      `http://localhost:8000/pridobiZgodovinoLetov/`,
-    );
-
+    const response = await fetch(`${apiUrl}/pridobiZgodovinoLetov/`);
     if (!response.ok) {
       console.error("Failed to fetch flights:", response.statusText);
       return;
@@ -30,14 +29,14 @@
   async function handleEditSave(updatedFlightData: Polet) {
     try {
       const response = await fetch(
-        `http://localhost:8000/poleti/${updatedFlightData.idPolet}`,
+        `${apiUrl}/poleti/${updatedFlightData.idPolet}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(updatedFlightData),
-        },
+        }
       );
 
       if (!response.ok) {
@@ -52,7 +51,7 @@
   }
 
   async function deleteFlight(id: number) {
-    const response = await fetch(`http://localhost:8000/polet/${id}`, {
+    const response = await fetch(`${apiUrl}/polet/${id}`, {
       method: "DELETE",
     });
     if (response.ok) {

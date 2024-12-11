@@ -11,12 +11,14 @@
     priimek: string;
   }
 
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
   let piloti: Pilot[] = [];
   let searchQuery: string = "";
-  let filteredPiloti: Pilot[] = []; 
+  let filteredPiloti: Pilot[] = [];
 
   async function fetchPilots() {
-    const response = await fetch(`http://localhost:8000/pridobiPilote/`, {
+    const response = await fetch(`${apiUrl}/pridobiPilote/`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -34,7 +36,7 @@
 
   async function handlePilotSave(pilotData: { ime: string; priimek: string }) {
     try {
-      const response = await fetch("http://localhost:8000/dodajPilota/", {
+      const response = await fetch(`${apiUrl}/dodajPilota/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -57,7 +59,7 @@
   async function handleEditSave(updatedPilotData: Pilot) {
     try {
       const response = await fetch(
-        `http://localhost:8000/pilot/${updatedPilotData.idPilot}`,
+        `${apiUrl}/pilot/${updatedPilotData.idPilot}`,
         {
           method: "PUT",
           headers: {
@@ -79,7 +81,7 @@
   }
 
   async function deletePilot(id: number) {
-    const response = await fetch(`http://localhost:8000/pilot/${id}`, {
+    const response = await fetch(`${apiUrl}/pilot/${id}`, {
       method: "DELETE",
     });
     if (response.ok) {
