@@ -14,7 +14,7 @@
 
   let poleti: Polet[] = [];
 
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+  const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
   async function fetchFlights() {
     const response = await fetch(`${apiUrl}/pridobiPrihodnjeLete/`);

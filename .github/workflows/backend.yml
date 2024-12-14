@@ -98,3 +98,15 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/backend:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }}
+
+  deploy-frontend:
+    needs: test-backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Render Deployment
+        if: github.ref == 'refs/heads/develop'
+        env:
+          deploy_url: ${{ secrets.BACKEND_RENDER_DEPLOY_HOOK}}
+        run: |
+          curl '$deploy_url'
