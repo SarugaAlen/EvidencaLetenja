@@ -109,4 +109,4 @@ jobs:
         env:
           deploy_url: ${{ secrets.BACKEND_RENDER_DEPLOY_HOOK}}
         run: |
-          curl '$deploy_url'
+          curl "$deploy_url"

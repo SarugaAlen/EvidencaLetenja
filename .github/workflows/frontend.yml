@@ -118,4 +118,4 @@ jobs:
         env:
           deploy_url: ${{ secrets.FRONTEND_RENDER_DEPLOY_HOOK}}
         run: |
-          curl '$deploy_url'
+          curl "$deploy_url"
