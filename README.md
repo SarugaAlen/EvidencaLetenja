@@ -1,5 +1,8 @@
 #  Evidenca letenja projekt
 
+## GitHub Pages
+https://sarugaalen.github.io/RIRS_naloga_2/
+
 ## Struktura projekta
 
     Backend: FastAPI
