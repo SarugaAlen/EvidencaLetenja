@@ -82,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-coverage
-          path: frontend/evidencaLetenja/coverage
+          path: frontend/evidencaLetenja/build
   
   dockerize-and-push-dev:
     needs: test-frontend
