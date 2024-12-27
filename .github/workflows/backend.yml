@@ -148,7 +148,7 @@ jobs:
 
 
   dockerize-and-push-prod:
-    needs: test-backend
+    needs: [test-backend, sonarcloud-analysis]
     runs-on: ubuntu-latest
     environment:
       name: Production
