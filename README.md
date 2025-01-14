@@ -16,6 +16,9 @@ Throughout the project, we gradually developed and improved the CI/CD pipeline f
 - **SonarCloud Analysis:** Code quality reviews and analysis using SonarCloud to improve coding standards.
 - **Application Deployment:** Deployment to GitHub Pages for quick functionality verification and triggering the Render API for server deployment.
 
+  ![pipeline](https://github.com/user-attachments/assets/a5cf862d-1962-429c-aa4b-c15ef1a9dec4)
+
+
 ## Project Structure
 - **Backend:** FastAPI  
 - **Frontend:** Svelte  
